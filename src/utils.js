@@ -17,6 +17,26 @@ export function buildDefaultCssProp(t, css) {
   )
 }
 
+export function buildClassNameProp(t, css) {
+    return t.jSXAttribute(
+        t.jSXIdentifier('className'),
+        t.jSXExpressionContainer(
+            t.taggedTemplateExpression(
+                t.identifier('css'),
+                t.templateLiteral(
+                    [
+                        t.templateElement({
+                            raw: css,
+                            cooked: css,
+                        })
+                    ],
+                    [],
+                )
+            )
+        )
+    )
+}
+
 export function addTemplateToTemplate(target, template) {
   if (template.expressions.length > 0) {
     if (target.expressions.length === target.quasis.length) {

@@ -1,4 +1,6 @@
 // const printAST = require('ast-pretty-print')
+import {buildClassNameProp} from "./utils";
+
 const {
   addTemplateToTemplate,
   addStringToTemplate,
@@ -90,9 +92,10 @@ const defaultRowCss = 'display: flex;flex-direction: row;flex-shrink: 0;align-co
 
 export default function (t, node, tagName) {
   function buildProps(node, defaultCss, cssProps) {
-    const css = buildDefaultCssProp(t, defaultCss)
-    const cssTemplate = css.value.expression
-    const props = [css]
+    // const css = buildDefaultCssProp(t, defaultCss)
+      const className = buildClassNameProp(t, defaultCss)
+    const cssTemplate = className.value.expression
+    const props = [className]
 
     if (node.openingElement.attributes == null) {
       return props
