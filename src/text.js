@@ -1,4 +1,6 @@
 // const printAST = require('ast-pretty-print')
+import {buildClassNameProp} from "./utils";
+
 const {
   addTemplateToTemplate,
   addStringToTemplate,
@@ -56,9 +58,11 @@ const defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Robot
 
 export default function (t, node) {
   function buildProps(node, cssProps) {
-    const css = buildDefaultCssProp(t, defaultCss)
-    const cssTemplate = css.value.expression
-    const props = [css]
+      // const css = buildDefaultCssProp(t, defaultCss)
+      const className = buildClassNameProp(t, defaultCss)
+      className.value.expression.loc = node.loc
+      const cssTemplate = className.value.expression.quasi
+      const props = [className]
 
     if (node.openingElement.attributes == null) {
       return props

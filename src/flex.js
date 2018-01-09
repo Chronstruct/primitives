@@ -94,7 +94,8 @@ export default function (t, node, tagName) {
   function buildProps(node, defaultCss, cssProps) {
     // const css = buildDefaultCssProp(t, defaultCss)
       const className = buildClassNameProp(t, defaultCss)
-    const cssTemplate = className.value.expression
+      className.value.expression.loc = node.loc
+    const cssTemplate = className.value.expression.quasi
     const props = [className]
 
     if (node.openingElement.attributes == null) {
