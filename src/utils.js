@@ -1,9 +1,9 @@
 // const printAST = require('ast-pretty-print')
 
 export function buildDefaultCssProp(t, css) {
-  return t.jSXAttribute(
-    t.jSXIdentifier('css'),
-    t.jSXExpressionContainer(
+  return t.jsxAttribute(
+    t.jsxIdentifier('css'),
+    t.jsxExpressionContainer(
       t.templateLiteral(
         [
           t.templateElement({
@@ -18,9 +18,9 @@ export function buildDefaultCssProp(t, css) {
 }
 
 export function buildClassNameProp(t, css) {
-    return t.jSXAttribute(
-        t.jSXIdentifier('className'),
-        t.jSXExpressionContainer(
+    return t.jsxAttribute(
+        t.jsxIdentifier('className'),
+        t.jsxExpressionContainer(
             t.taggedTemplateExpression(
                 t.identifier('css'),
                 t.templateLiteral(
