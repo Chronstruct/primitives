@@ -310,7 +310,8 @@ it('css prop', () => {
 })
 
 it('css prop with height prop', () => {
-  var input = `<flex height={'20px'} css={\`width: 20px;\`}/>`;
+  //var input = `<flex height={'20px'} css={\`width: 20px;\`}/>`;
+    var input = `<flex height={'20px'} css={{width: 20}}/>`;
 
   const { code } = babel.transform(input, options)
 
@@ -318,7 +319,8 @@ it('css prop with height prop', () => {
 })
 
 it('css prop with dynamic height prop', () => {
-  var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+  //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex height={someVar} css={{width: 20}}/>`;
 
   const { code } = babel.transform(input, options)
 
@@ -347,4 +349,13 @@ it('css prop with multiple dynamic fields and props', () => {
   const { code } = babel.transform(input, options)
 
   expect(code).toBe('<div css={`' + defaultFlexCss + 'height: ${someHeight};margin: ${someMargin};width: ${someVar}px;padding: ${somePadding}px;`} />;')
+})
+
+it('converts inlineStyle to style', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex inlineStyle={{width: 20}} style={{height: 20}}/>`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
 })

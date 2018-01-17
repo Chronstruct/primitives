@@ -1,4 +1,5 @@
 // const printAST = require('ast-pretty-print')
+import * as t from 'babel-types'
 
 export function buildDefaultCssProp(t, css) {
   return t.jSXAttribute(
@@ -15,6 +16,43 @@ export function buildDefaultCssProp(t, css) {
       )
     )
   )
+}
+
+/*
+export function buildClassNamePropFunction(t, cssObject) {
+    return t.jSXAttribute(
+        t.jSXIdentifier('className'),
+        t.jSXExpressionContainer(
+            t.callExpression(
+                t.identifier('css'),
+                [
+                    cssObject
+                ]
+            )
+        )
+    )
+}
+*/
+
+export function buildClassNamePropFunction(t, cssObject) {
+    const objectProperties =
+        Object.keys(cssObject).map(key => t.objectProperty(
+            t.identifier(key),
+            cssObject[key],
+            )
+        )
+
+    return t.jSXAttribute(
+        t.jSXIdentifier('className'),
+        t.jSXExpressionContainer(
+            t.callExpression(
+                t.identifier('css'),
+                [
+                    t.objectExpression(objectProperties)
+                ]
+            )
+        )
+    )
 }
 
 export function buildClassNameProp(t, css) {

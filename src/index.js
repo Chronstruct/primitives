@@ -21,7 +21,7 @@ export default function (babel) {
           case 'col':
           case 'row':
           case 'flex':
-            convertFlex(t, path.node, element.name)
+            convertFlex(path.node, element.name)
             break
           case 'space':
             convertSpace(t, path.node)

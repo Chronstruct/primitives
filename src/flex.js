@@ -1,5 +1,6 @@
-// const printAST = require('ast-pretty-print')
-import {buildClassNameProp} from "./utils";
+const printAST = require('ast-pretty-print')
+import {buildClassNameProp, buildClassNamePropFunction} from "./utils";
+import * as t from 'babel-types'
 
 const {
   addTemplateToTemplate,
@@ -65,24 +66,35 @@ const flexPropsToUse = {
 
 const booleanProps = {
   center: {
-    consequent: 'align-items: center;justify-content: center;',
-    alternate: '',
+      alignItems: t.stringLiteral('center'),
+      justifyContent: t.stringLiteral('center'),
+    //consequent: 'align-items: center;justify-content: center;',
+    //alternate: '',
   },
   hidden: {
-    consequent: 'display: none;',
-    alternate: '',
+      display: t.stringLiteral('none'),
+    //consequent: 'display: none;',
+    //alternate: '',
   },
   inline: {
-    consequent: 'display: inline-flex;',
-    alternate: '',
+      display: t.stringLiteral('inline-flex'),
+    //consequent: 'display: inline-flex;',
+    //alternate: '',
   },
   fit: {
-    consequent: 'height: 100%;width: 100%;',
-    alternate: '',
+      height: t.stringLiteral('100%'),
+      width: t.stringLiteral('100%'),
+    //consequent: 'height: 100%;width: 100%;',
+    //alternate: '',
   },
   absoluteFill: {
-    consequent: 'position: absolute;top: 0;right: 0;bottom: 0;left: 0;',
-    alternate: '',
+      position: t.stringLiteral('absolute'),
+      top: t.numericLiteral(0),
+      right: t.numericLiteral(0),
+      bottom: t.numericLiteral(0),
+      left: t.numericLiteral(0),
+    //consequent: 'position: absolute;top: 0;right: 0;bottom: 0;left: 0;',
+    //alternate: '',
   },
 }
 
@@ -90,89 +102,169 @@ const defaultFlexCss = 'display: flex;flex-shrink: 0;align-content: flex-start;p
 const defaultColCss = 'display: flex;flex-direction: column;flex-shrink: 0;align-content: flex-start;position: relative;'
 const defaultRowCss = 'display: flex;flex-direction: row;flex-shrink: 0;align-content: flex-start;position: relative;'
 
-export default function (t, node, tagName) {
+/*
+const defaultFlex = t.objectExpression(
+    [
+        t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
+        t.objectProperty(t.identifier('alignContent'), t.stringLiteral('flexStart')),
+        t.objectProperty(t.identifier('position'), t.stringLiteral('relative')),
+        t.objectProperty(t.identifier('flexShrink'), t.numericLiteral(0)),
+    ]
+)
+
+const defaultCol = t.objectExpression(
+    [
+        t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
+        t.objectProperty(t.identifier('flexDirection'), t.stringLiteral('column')),
+        t.objectProperty(t.identifier('alignContent'), t.stringLiteral('flexStart')),
+        t.objectProperty(t.identifier('position'), t.stringLiteral('relative')),
+        t.objectProperty(t.identifier('flexShrink'), t.numericLiteral(0)),
+    ]
+)
+
+const defaultRow = t.objectExpression(
+    [
+        t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
+        t.objectProperty(t.identifier('flexDirection'), t.stringLiteral('row')),
+        t.objectProperty(t.identifier('alignContent'), t.stringLiteral('flexStart')),
+        t.objectProperty(t.identifier('position'), t.stringLiteral('relative')),
+        t.objectProperty(t.identifier('flexShrink'), t.numericLiteral(0)),
+    ]
+)
+*/
+
+const defaultFlex = {
+    'display': t.stringLiteral('flex'),
+    'alignContent': t.stringLiteral('flex-start'),
+    'position': t.stringLiteral('relative'),
+    'flexShrink': t.numericLiteral(0),
+}
+
+const defaultCol = {
+    'display': t.stringLiteral('flex'),
+    'flexDirection': t.stringLiteral('column'),
+    'alignContent': t.stringLiteral('flex-start'),
+    'position': t.stringLiteral('relative'),
+    'flexShrink': t.numericLiteral(0),
+}
+
+const defaultRow = {
+    'display': t.stringLiteral('flex'),
+    'flexDirection': t.stringLiteral('row'),
+    'alignContent': t.stringLiteral('flex-start'),
+    'position': t.stringLiteral('relative'),
+    'flexShrink': t.numericLiteral(0),
+}
+
+export default function (node, tagName) {
   function buildProps(node, defaultCss, cssProps) {
     // const css = buildDefaultCssProp(t, defaultCss)
-      const className = buildClassNameProp(t, defaultCss)
-      className.value.expression.loc = node.loc
-    const cssTemplate = className.value.expression.quasi
-    const props = [className]
+      const cssProperties = {...defaultCss}
 
-    if (node.openingElement.attributes == null) {
-      return props
+      const props = []
+
+      //const className = buildClassNamePropFunction(t, cssProperties)
+      //className.value.expression.loc = node.loc
+
+    //const cssProperties = className.value.expression.arguments[0].properties
+
+    //const props = [className]
+
+    if (node.openingElement.attributes != null) {
+        node.openingElement.attributes.forEach(attribute => {
+            if (!attribute.name) {
+                return
+            }
+
+            const name = attribute.name.name
+
+            if (name in propsToOmit) {
+                return
+            }
+            else if (name === 'style') {
+                attribute.value.expression.properties.forEach(property => {
+                    addCssProperty(cssProperties, property.key.name, property.value)
+                })
+            }
+            else if (name === 'inlineStyle') {
+                attribute.name.name = 'style'
+                props.push(attribute)
+            }
+            else if (name in cssProps) {
+                addCssProperty(cssProperties, name, attribute.value)
+            }
+            else if (name in booleanProps) {
+                addBooleanProperty(cssProperties, attribute, booleanProps[name])
+            }
+            //else if (name === 'grow') {
+            //addGrowProp(cssTemplate, attribute)
+            //}
+            else {
+                props.push(attribute)
+            }
+        })
     }
 
-    node.openingElement.attributes.forEach(attribute => {
-      if (!attribute.name) {
-        return
-      }
+      //console.log(cssProperties)
 
-      const name = attribute.name.name
+      const className = buildClassNamePropFunction(t, cssProperties)
 
-      if (name in propsToOmit) {
-        return
-      }
-      else if (name === 'css') {
-        addTemplateToTemplate(cssTemplate, attribute.value.expression)
-      }
-      else if (name in cssProps) {
-        addCssProp(cssTemplate, attribute, cssProps[name])
-      }
-      else if (name in booleanProps) {
-        addBooleanProp(cssTemplate, attribute, name, booleanProps[name])
-      }
-      else if (name === 'grow') {
-        addGrowProp(cssTemplate, attribute)
-      }
-      else {
-        props.push(attribute)
-      }
-    })
+      //console.log(className)
+      className.value.expression.loc = node.loc
+
+      //const cssProperties = className.value.expression.arguments[0].properties
+
+      props.push(className)
 
     return props
   }
 
-  function addCssProp(cssTemplate, attribute, name) {
-    const { value } = attribute
+    function addCssProperty(cssProperties, key, propValue) {
+        let value = propValue
 
-    if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
+        if (t.isJSXExpressionContainer(propValue)) {
+            value = propValue.expression
+        }
 
-      // console.log(printAST(expression));
-
-      if (t.isNumericLiteral(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: ${expression.extra.raw};`)
-      }
-      else if (t.isStringLiteral(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: ${expression.value};`)
-      }
-      else if (t.isIdentifier(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: `)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-        addExpressionToTemplate(cssTemplate, t.identifier(expression.name))
-      }
-      else if (t.isTemplateLiteral(expression)) {
-        expression.quasis[0].value.cooked = `${name}: ${expression.quasis[0].value.cooked}`
-        expression.quasis[0].value.raw = `${name}: ${expression.quasis[0].value.raw}`
-        addTemplateToTemplate(cssTemplate, expression)
-        addStringToTemplate(cssTemplate, `;`)
-      }
-      else if (t.isBinaryExpression(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: `)
-        addExpressionToTemplate(cssTemplate, expression)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-      }
-      else if (t.isConditionalExpression(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: `)
-        addExpressionToTemplate(cssTemplate, expression)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-      }
-
+        //properties.push(t.objectProperty(t.identifier(key), value))
+        cssProperties[key] = value
     }
-    else if (t.isStringLiteral(value)) {
-      addStringToTemplate(cssTemplate, `${name}: ${value.value};`)
+
+    function addCssProperties(cssProperties, propertiesToAdd) {
+        Object.keys(propertiesToAdd).forEach(key => {
+            addCssProperty(cssProperties, key, propertiesToAdd[key])
+        })
     }
-  }
+
+    function addBooleanProperty(cssProperties, attribute, booleanProperties) {
+        const { value } = attribute
+
+        if (value === null) {
+            addCssProperties(cssProperties, booleanProperties)
+        }
+        else if (t.isJSXExpressionContainer(value)) {
+            const { expression } = value
+
+            if (t.isBooleanLiteral(expression) && expression.value === true) {
+                addCssProperties(cssProperties, booleanProperties)
+            }
+            /*
+            else if (t.isIdentifier(expression)) {
+                addExpressionToTemplate(cssTemplate, t.conditionalExpression(
+                    t.binaryExpression(
+                        '===',
+                        t.identifier(expression.name),
+                        t.booleanLiteral(true),
+                    ),
+                    t.stringLiteral(consequent),
+                    t.stringLiteral(alternate),
+                ))
+
+                addQuasiToTemplate(cssTemplate, t.templateElement({raw: '', cooked: ''}))
+            }
+            */
+        }
+    }
 
   function addBooleanProp(cssTemplate, attribute, name, {consequent, alternate}) {
     const { value } = attribute
@@ -230,18 +322,18 @@ export default function (t, node, tagName) {
 
   if (tagName === 'view') {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultColCss, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
   }
   else if (tagName === 'col') {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultColCss, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
   }
   else if (tagName === 'row') {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultRowCss, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultRow, propsToUse)
   }
   else if (tagName === 'flex') {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultFlexCss, flexPropsToUse)
+    node.openingElement.attributes = buildProps(node, defaultFlex, flexPropsToUse)
   }
 }
