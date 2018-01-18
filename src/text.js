@@ -1,30 +1,22 @@
 // const printAST = require('ast-pretty-print')
-import {buildClassNameProp} from "./utils";
-
-const {
-  addTemplateToTemplate,
-  addStringToTemplate,
-  addQuasiToTemplate,
-  addExpressionToTemplate,
-  buildDefaultCssProp,
-  renameTag,
-} = require('./utils')
+import {renameTag, addBooleanProperty, addCssProperty, addGrowProp, buildClassNameProp, buildClassNamePropFunction} from "./utils";
+import * as t from 'babel-types'
 
 const propsToOmit = {
   as: true,
 }
 
-const propsToUse = {
-  align: 'text-align',
+const cssProps = {
+  align: 'textAlign',
   color: 'color',
-  decoration: 'text-decoration',
-  decorationColor: 'text-decoration-color',
-  font: 'font-family',
-  height: 'line-height',
-  size: 'font-size',
-  spacing: 'letter-spacing',
-  transform: 'text-transform',
-  weight: 'font-weight',
+  decoration: 'textDecoration',
+  decorationColor: 'textDecorationColor',
+  font: 'fontFamily',
+  height: 'lineHeight',
+  size: 'fontSize',
+  spacing: 'letterSpacing',
+  transform: 'textTransform',
+  weight: 'fontWeight',
   // ellipsis
   // underline
 
@@ -32,68 +24,95 @@ const propsToUse = {
 
 const booleanProps = {
   antialiased: {
-    consequent: '-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;',
-    alternate: '',
+      webkitFontSmoothing: t.stringLiteral('antialiased'),
+      mozOsxFontSmoothing: t.stringLiteral('grayscale'),
+    //consequent: '-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;',
+    //alternate: '',
   },
   italic: {
-    consequent: 'font-style: italic;',
-    alternate: '',
+      fontStyle: t.stringLiteral('italic'),
+    //consequent: 'font-style: italic;',
+    //alternate: '',
   },
   center: {
-    consequent: 'text-align: center;',
-    alternate: '',
+      textAlign: t.stringLiteral('center'),
+    //consequent: 'text-align: center;',
+    //alternate: '',
   },
   bold: {
-    consequent: 'font-weight: bold;',
-    alternate: '',
+      fontWeight: t.stringLiteral('bold'),
+    //consequent: 'font-weight: bold;',
+    //alternate: '',
   },
   uppercase: {
-    consequent: 'text-transform: uppercase;',
-    alternate: '',
+      textTransform: t.stringLiteral('uppercase'),
+    //consequent: 'text-transform: uppercase;',
+    //alternate: '',
   },
 }
 
 // from https://bitsofco.de/the-new-system-font-stack/
-const defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
+//const defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
+const defaultCss = {
+    'fontFamily': t.stringLiteral('-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif'),
+}
 
-export default function (t, node) {
-  function buildProps(node, cssProps) {
+export default function (node) {
+  function buildProps(node, defaultCss) {
+      const cssProperties = {...defaultCss}
+
+      const props = []
+
       // const css = buildDefaultCssProp(t, defaultCss)
-      const className = buildClassNameProp(t, defaultCss)
-      className.value.expression.loc = node.loc
-      const cssTemplate = className.value.expression.quasi
-      const props = [className]
+      //const className = buildClassNameProp(t, defaultCss)
+      //className.value.expression.loc = node.loc
+      //const cssTemplate = className.value.expression.quasi
+      //const props = [className]
 
-    if (node.openingElement.attributes == null) {
-      return props
+    if (node.openingElement.attributes != null) {
+        node.openingElement.attributes.forEach(attribute => {
+            const name = attribute.name.name
+
+            if (name in propsToOmit) {
+                return
+            }
+            else if (name === 'style') {
+                attribute.value.expression.properties.forEach(property => {
+                    addCssProperty(cssProperties, property.key.name, property.value)
+                })
+            }
+            else if (name === 'inlineStyle') {
+                attribute.name.name = 'style'
+                props.push(attribute)
+            }
+            else if (name in cssProps) {
+                addCssProperty(cssProperties, cssProps[name], attribute.value)
+            }
+            else if (name in booleanProps) {
+                addBooleanProperty(cssProperties, attribute, booleanProps[name])
+            }
+            else if (name === 'grow') {
+                addGrowProp(cssProperties, attribute)
+            }
+            else {
+                props.push(attribute)
+            }
+        })
     }
 
-    node.openingElement.attributes.forEach(attribute => {
-      const name = attribute.name.name
+      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
-      if (name in propsToOmit) {
-        return
-      }
-      else if (name === 'css') {
-        addTemplateToTemplate(cssTemplate, attribute.value.expression)
-      }
-      else if (name in propsToUse) {
-        addCssProp(cssTemplate, attribute, propsToUse[name])
-      }
-      else if (name in booleanProps) {
-        addBooleanProp(cssTemplate, attribute, name, booleanProps[name])
-      }
-      else if (name === 'grow') {
-        addGrowProp(cssTemplate, attribute)
-      }
-      else {
-        props.push(attribute)
-      }
-    })
+      //console.log(className)
+      className.value.expression.loc = node.loc
 
-    return props
+      //const cssProperties = className.value.expression.arguments[0].properties
+
+      props.push(className)
+
+      return props
   }
 
+  /*
   function addCssProp(cssTemplate, attribute, name) {
     const { value } = attribute
 
@@ -189,7 +208,8 @@ export default function (t, node) {
       addStringToTemplate(cssTemplate, `flex-grow: ${value.value};`)
     }
   }
+  */
 
   renameTag(node, 'span')
-  node.openingElement.attributes = buildProps(node)
+  node.openingElement.attributes = buildProps(node, defaultCss)
 }
