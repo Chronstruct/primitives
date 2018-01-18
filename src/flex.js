@@ -21,47 +21,47 @@ const propsToUse = {
   bottom: 'bottom',
   left: 'left',
   width: 'width',
-  maxWidth: 'max-width',
-  minWidth: 'min-width',
+  maxWidth: 'maxWidth',
+  minWidth: 'minWidth',
   height: 'height',
-  maxHeight: 'max-height',
-  minHeight: 'min-height',
+  maxHeight: 'maxHeight',
+  minHeight: 'minHeight',
 
   flex: 'flex',
-  wrap: 'flex-wrap',
+  wrap: 'flexWrap',
   // grow: 'flex-grow',
-  shrink: 'flex-shrink',
-  basis: 'flex-basis',
+  shrink: 'flexShrink',
+  basis: 'flexBasis',
   order: 'order',
-  alignContent: 'align-content',
-  alignSelf: 'align-self',
-  align: 'align-items',
-  justify: 'justify-content',
+  alignContent: 'alignContent',
+  alignSelf: 'alignSelf',
+  align: 'alignItems',
+  justify: 'justifyContent',
   // alignVertical
   // alignHorizontal
 
   padding: 'padding',
-  paddingTop: 'padding-top',
-  paddingRight: 'padding-right',
-  paddingBottom: 'padding-bottom',
-  paddingLeft: 'padding-left',
+  paddingTop: 'paddingTop',
+  paddingRight: 'paddingRight',
+  paddingBottom: 'paddingBottom',
+  paddingLeft: 'paddingLeft',
   margin: 'margin',
-  marginTop: 'margin-top',
-  marginRight: 'margin-right',
-  marginBottom: 'margin-bottom',
-  marginLeft: 'margin-left',
+  marginTop: 'marginTop',
+  marginRight: 'marginRight',
+  marginBottom: 'marginBottom',
+  marginLeft: 'marginLeft',
 
   position: 'position',
   overflow: 'overflow',
-  overflowX: 'overflow-x',
-  overflowY: 'overflow-y',
+  overflowX: 'overflowX',
+  overflowY: 'overflowY',
   //WebkitOverflowScrolling
-  zIndex: 'z-index',
+  zIndex: 'zIndex',
 }
 
 const flexPropsToUse = {
   ...propsToUse,
-  direction: 'flex-direction',
+  direction: 'flexDirection',
 }
 
 const booleanProps = {
@@ -183,7 +183,7 @@ export default function (node, tagName) {
             }
             else if (name === 'style') {
                 attribute.value.expression.properties.forEach(property => {
-                    addCssProperty(cssProperties, property.key.name, property.value)
+                    addCssProperty(cssProperties, property.key.name, property.value, cssProps)
                 })
             }
             else if (name === 'inlineStyle') {
@@ -191,14 +191,14 @@ export default function (node, tagName) {
                 props.push(attribute)
             }
             else if (name in cssProps) {
-                addCssProperty(cssProperties, name, attribute.value)
+                addCssProperty(cssProperties, cssProps[name], attribute.value, cssProps)
             }
             else if (name in booleanProps) {
                 addBooleanProperty(cssProperties, attribute, booleanProps[name])
             }
-            //else if (name === 'grow') {
-            //addGrowProp(cssTemplate, attribute)
-            //}
+            else if (name === 'grow') {
+                addGrowProp(cssProperties, attribute)
+            }
             else {
                 props.push(attribute)
             }
@@ -219,15 +219,61 @@ export default function (node, tagName) {
     return props
   }
 
-    function addCssProperty(cssProperties, key, propValue) {
-        let value = propValue
-
+    function addCssProperty(cssProperties, key, propValue, cssProps) {
         if (t.isJSXExpressionContainer(propValue)) {
-            value = propValue.expression
-        }
+            const {expression} = propValue
 
-        //properties.push(t.objectProperty(t.identifier(key), value))
-        cssProperties[key] = value
+            if (t.isObjectExpression(expression)) {
+                expression.properties.forEach((property) => {
+                    //console.log(property)
+                    //TODO: handle when key is of type 'Identifier'
+
+                    // base case
+                    if (property.key.value === '') {
+                        cssProperties[key] = property.value
+                    }
+                    // state that ISN'T already in cssProperties
+                    else if (!(property.key.value in cssProperties)) {
+                        cssProperties[property.key.value] = t.objectExpression(
+                            [
+                                t.objectProperty(t.identifier(key), property.value),
+                            ]
+                        )
+                    }
+                    // state that IS already in cssProperties
+                    else if (property.key.value in cssProperties) {
+                        cssProperties[property.key.value].properties.push(t.objectProperty(t.identifier(key), property.value))
+                    }
+                })
+            }
+            else {
+                cssProperties[key] = expression
+            }
+        }
+        else if (t.isObjectExpression(propValue)) {
+            propValue.properties.forEach((property) => {
+
+                // base case
+                if (property.key.value === '') {
+                    cssProperties[key] = property.value
+                }
+                // state that ISN'T already in cssProperties
+                else if (!(property.key.value in cssProperties)) {
+                    cssProperties[property.key.value] = t.objectExpression(
+                        [
+                            t.objectProperty(t.identifier(key), property.value),
+                        ]
+                    )
+                }
+                // state that IS already in cssProperties
+                else if (property.key.value in cssProperties) {
+                    cssProperties[property.key.value].properties.push(t.objectProperty(t.identifier(key), property.value))
+                }
+            })
+        }
+        else {
+            cssProperties[key] = propValue
+        }
     }
 
     function addCssProperties(cssProperties, propertiesToAdd) {
@@ -266,57 +312,27 @@ export default function (node, tagName) {
         }
     }
 
-  function addBooleanProp(cssTemplate, attribute, name, {consequent, alternate}) {
+  function addGrowProp(cssProperties, attribute) {
     const { value } = attribute
 
     if (value === null) {
-      addStringToTemplate(cssTemplate, consequent)
-    }
-    else if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
-
-      if (t.isBooleanLiteral(expression) && expression.value === true) {
-        addStringToTemplate(cssTemplate, consequent)
-      }
-      else if (t.isIdentifier(expression)) {
-        addExpressionToTemplate(cssTemplate, t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.identifier(expression.name),
-            t.booleanLiteral(true),
-          ),
-          t.stringLiteral(consequent),
-          t.stringLiteral(alternate),
-        ))
-
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: '', cooked: ''}))
-      }
-    }
-  }
-
-  function addGrowProp(cssTemplate, attribute) {
-    const { value } = attribute
-
-    if (value === null) {
-      addStringToTemplate(cssTemplate, 'flex-grow: 1;')
+        addCssProperty(cssProperties, 'flexGrow', t.numericLiteral(1))
     }
     else if (t.isJSXExpressionContainer(value)) {
       const { expression } = value
 
       if (t.isNumericLiteral(expression)) {
-        addStringToTemplate(cssTemplate, `flex-grow: ${expression.extra.raw};`)
+        addCssProperty(cssProperties, 'flexGrow', expression)
       }
       else if (t.isStringLiteral(expression)) {
-        addStringToTemplate(cssTemplate, `flex-grow: ${expression.value};`)
+          addCssProperty(cssProperties, 'flexGrow', expression)
       }
       else if (t.isIdentifier(expression)) {
-        addStringToTemplate(cssTemplate, `flex-grow: `)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-        addExpressionToTemplate(cssTemplate, t.identifier(expression.name))
+          addCssProperty(cssProperties, 'flexGrow', expression)
       }
     }
     else if (t.isStringLiteral(value)) {
-      addStringToTemplate(cssTemplate, `flex-grow: ${value.value};`)
+        addCssProperty(cssProperties, 'flexGrow', value)
     }
   }
 

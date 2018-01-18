@@ -36,10 +36,12 @@ export function buildClassNamePropFunction(t, cssObject) {
 
 export function buildClassNamePropFunction(t, cssObject) {
     const objectProperties =
-        Object.keys(cssObject).map(key => t.objectProperty(
-            t.identifier(key),
-            cssObject[key],
-            )
+        Object.keys(cssObject).map(key => {
+            return t.objectProperty(
+                    t.identifier(!isNaN(key) ? `@media screen and (min-width: ${key}px)` : key),
+                    cssObject[key],
+                )
+            }
         )
 
     return t.jSXAttribute(

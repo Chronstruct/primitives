@@ -359,3 +359,49 @@ it('converts inlineStyle to style', () => {
 
     expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
 })
+
+it('handles media queries', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex height={{ '': 30, '@media screen and (min-width: 600px)': 400}} />`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
+})
+
+it('handles media queries numbers', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex height={{ '': 30, [600]: 400}} />`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
+})
+
+it('handles media queries vars', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    const PHONE = '@media screen and (min-width: 600px)'
+    var input = `<flex height={{ '': 30, [PHONE]: 400}} />`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
+})
+
+it('handles media queries in style', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex style={{ backgroundColor: {'': 'purple', '@media screen and (min-width: 600px)': 'green'}}} />`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
+})
+
+it('handles multiple media queries', () => {
+    //var input = `<flex height={someVar} css={\`width: 20px;\`}/>`;
+    var input = `<flex height={{ '': 30, '@media screen and (min-width: 600px)': 400}} width={{ '': 30, '@media screen and (min-width: 600px)': 400}}/>`;
+
+    const { code } = babel.transform(input, options)
+
+    expect(code).toBe('<div style={{width: 20}} css={`' + defaultFlexCss + 'height: 20px;`}  />;')
+})
