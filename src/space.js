@@ -1,57 +1,57 @@
 // const printAST = require('ast-pretty-print')
-import {buildClassNameProp} from "./utils";
-
-const {
-  addTemplateToTemplate,
-  addStringToTemplate,
-  addQuasiToTemplate,
-  addExpressionToTemplate,
-  buildDefaultCssProp,
-  renameTag,
-} = require('./utils')
+import {renameTag, addBooleanProperty, addCssProperty, addGrowProp, buildClassNameProp, buildClassNamePropFunction} from "./utils";
+import * as t from 'babel-types'
 
 const propsToOmit = {
   as: true,
 }
 
-const propsToUse = {
-  size: 'flex-basis',
+const cssProps = {
+  size: 'flexBasis',
 }
 
-const defaultCss = 'flex-grow: 0;flex-shrink: 0;'
+const defaultCss = {flexGrow: t.numericLiteral(0), flexShrink: t.numericLiteral(0)}
 
-export default function (t, node) {
+export default function (node) {
   function buildProps(node) {
-      // const css = buildDefaultCssProp(t, defaultCss)
-      const className = buildClassNameProp(t, defaultCss)
-      className.value.expression.loc = node.loc
-      const cssTemplate = className.value.expression.quasi
-      const props = [className]
+      const cssProperties = {...defaultCss}
 
-    if (node.openingElement.attributes == null) {
-      return props
+      const props = []
+
+    if (node.openingElement.attributes != null) {
+        node.openingElement.attributes.forEach(attribute => {
+            const name = attribute.name.name
+
+            if (name in propsToOmit) {
+                return
+            }
+            else if (name === 'style') {
+                attribute.value.expression.properties.forEach(property => {
+                    addCssProperty(cssProperties, property.key.name, property.value, cssProps)
+                })
+            }
+            else if (name in cssProps) {
+                addCssProperty(cssProperties, cssProps[name], attribute.value, cssProps)
+            }
+            else {
+                props.push(attribute)
+            }
+        })
     }
 
-    node.openingElement.attributes.forEach(attribute => {
-      const name = attribute.name.name
+      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
-      if (name in propsToOmit) {
-        return
-      }
-      else if (name === 'css') {
-        addTemplateToTemplate(cssTemplate, attribute.value.expression)
-      }
-      else if (name in propsToUse) {
-        addCssProp(cssTemplate, attribute, propsToUse[name])
-      }
-      else {
-        props.push(attribute)
-      }
-    })
+      //console.log(className)
+      className.value.expression.loc = node.loc
 
-    return props
+      //const cssProperties = className.value.expression.arguments[0].properties
+
+      props.push(className)
+
+      return props
   }
 
+  /*
   function addCssProp(cssTemplate, attribute, name) {
     const { value } = attribute
 
@@ -85,6 +85,7 @@ export default function (t, node) {
       addStringToTemplate(cssTemplate, `${name}: ${value.value};`)
     }
   }
+  */
 
   renameTag(node)
   node.openingElement.attributes = buildProps(node)

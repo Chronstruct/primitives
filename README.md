@@ -3,6 +3,11 @@
 ## Dev Notes
 To run a single test, use `jest -t 'test name'`
 
+- [Babel types · Babel](https://babeljs.io/docs/core-packages/babel-types)
+- [AST explorer](https://astexplorer.net/)
+- [babel\-plugin\-object\-styles\-to\-template/index\.js at master · satya164/babel\-plugin\-object\-styles\-to\-template](https://github.com/satya164/babel-plugin-object-styles-to-template/blob/master/index.js)
+- [babel\-literal\-to\-ast/index\.js at master · izaakschroeder/babel\-literal\-to\-ast](https://github.com/izaakschroeder/babel-literal-to-ast/blob/master/src/index.js)
+
 ## Inspirations
 - [constelation/monorepo: Mono repo for constelation's Components, functions, and CONSTANTS](https://github.com/constelation/monorepo)
 - [jxnblk/rebass: Functional React UI component library, built with styled\-components](https://github.com/jxnblk/rebass)

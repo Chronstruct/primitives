@@ -21,13 +21,14 @@ export default function (babel) {
           case 'col':
           case 'row':
           case 'flex':
+          case 'box':
             convertFlex(path.node, element.name)
             break
           case 'space':
-            convertSpace(t, path.node)
+            convertSpace(path.node)
             break
           case 'text':
-            convertText(t, path.node)
+            convertText(path.node)
             break
         }
       }

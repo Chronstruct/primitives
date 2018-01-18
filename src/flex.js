@@ -128,7 +128,7 @@ const defaultFlex = {
     'display': t.stringLiteral('flex'),
     'alignContent': t.stringLiteral('flex-start'),
     'position': t.stringLiteral('relative'),
-    'flexShrink': t.numericLiteral(0),
+    'shrink': t.numericLiteral(0),
 }
 
 const defaultCol = {
@@ -136,7 +136,7 @@ const defaultCol = {
     'flexDirection': t.stringLiteral('column'),
     'alignContent': t.stringLiteral('flex-start'),
     'position': t.stringLiteral('relative'),
-    'flexShrink': t.numericLiteral(0),
+    'shrink': t.numericLiteral(0),
 }
 
 const defaultRow = {
@@ -144,7 +144,7 @@ const defaultRow = {
     'flexDirection': t.stringLiteral('row'),
     'alignContent': t.stringLiteral('flex-start'),
     'position': t.stringLiteral('relative'),
-    'flexShrink': t.numericLiteral(0),
+    'shrink': t.numericLiteral(0),
 }
 
 export default function (node, tagName) {
@@ -198,7 +198,7 @@ export default function (node, tagName) {
 
       //console.log(cssProperties)
 
-      const className = buildClassNamePropFunction(t, cssProperties)
+      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
       //console.log(className)
       className.value.expression.loc = node.loc
@@ -213,7 +213,7 @@ export default function (node, tagName) {
 
   if (tagName === 'view') {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultFlex, flexPropsToUse)
   }
   else if (tagName === 'col') {
     renameTag(node)

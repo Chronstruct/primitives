@@ -57,7 +57,7 @@ const defaultCss = {
     'fontFamily': t.stringLiteral('-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif'),
 }
 
-export default function (t, node) {
+export default function (node) {
   function buildProps(node, defaultCss) {
       const cssProperties = {...defaultCss}
 
@@ -100,7 +100,7 @@ export default function (t, node) {
         })
     }
 
-      const className = buildClassNamePropFunction(t, cssProperties)
+      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
       //console.log(className)
       className.value.expression.loc = node.loc

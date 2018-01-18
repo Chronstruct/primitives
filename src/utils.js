@@ -34,12 +34,21 @@ export function buildClassNamePropFunction(t, cssObject) {
 }
 */
 
-export function buildClassNamePropFunction(t, cssObject) {
+export function buildClassNamePropFunction(t, cssObject, keyAliases) {
     const objectProperties =
         Object.keys(cssObject).map(key => {
+            const value = cssObject[key]
+
+            if (!isNaN(key)) {
+                key = `@media screen and (min-width: ${key}px)`
+            }
+            else if (key in keyAliases) {
+                key = keyAliases[key]
+            }
+
             return t.objectProperty(
-                    t.identifier(!isNaN(key) ? `@media screen and (min-width: ${key}px)` : key),
-                    cssObject[key],
+                    t.identifier(key),
+                    value,
                 )
             }
         )
