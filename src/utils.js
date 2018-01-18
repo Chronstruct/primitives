@@ -138,3 +138,120 @@ export function renameTag(node, defaultTag = 'div') {
     node.closingElement.name.name = tagName
   }
 }
+
+export function addCssProperty(cssProperties, key, propValue) {
+    if (t.isJSXExpressionContainer(propValue)) {
+        const {expression} = propValue
+
+        if (t.isObjectExpression(expression)) {
+            expression.properties.forEach((property) => {
+                //console.log(property)
+                //TODO: handle when key is of type 'Identifier'
+
+                // base case
+                if (property.key.value === '') {
+                    cssProperties[key] = property.value
+                }
+                // state that ISN'T already in cssProperties
+                else if (!(property.key.value in cssProperties)) {
+                    cssProperties[property.key.value] = t.objectExpression(
+                        [
+                            t.objectProperty(t.identifier(key), property.value),
+                        ]
+                    )
+                }
+                // state that IS already in cssProperties
+                else if (property.key.value in cssProperties) {
+                    cssProperties[property.key.value].properties.push(t.objectProperty(t.identifier(key), property.value))
+                }
+            })
+        }
+        else {
+            cssProperties[key] = expression
+        }
+    }
+    else if (t.isObjectExpression(propValue)) {
+        propValue.properties.forEach((property) => {
+
+            // base case
+            if (property.key.value === '') {
+                cssProperties[key] = property.value
+            }
+            // state that ISN'T already in cssProperties
+            else if (!(property.key.value in cssProperties)) {
+                cssProperties[property.key.value] = t.objectExpression(
+                    [
+                        t.objectProperty(t.identifier(key), property.value),
+                    ]
+                )
+            }
+            // state that IS already in cssProperties
+            else if (property.key.value in cssProperties) {
+                cssProperties[property.key.value].properties.push(t.objectProperty(t.identifier(key), property.value))
+            }
+        })
+    }
+    else {
+        cssProperties[key] = propValue
+    }
+}
+
+export function addCssProperties(cssProperties, propertiesToAdd) {
+    Object.keys(propertiesToAdd).forEach(key => {
+        addCssProperty(cssProperties, key, propertiesToAdd[key])
+    })
+}
+
+export function addBooleanProperty(cssProperties, attribute, booleanProperties) {
+    const { value } = attribute
+
+    if (value === null) {
+        addCssProperties(cssProperties, booleanProperties)
+    }
+    else if (t.isJSXExpressionContainer(value)) {
+        const { expression } = value
+
+        if (t.isBooleanLiteral(expression) && expression.value === true) {
+            addCssProperties(cssProperties, booleanProperties)
+        }
+        /*
+        else if (t.isIdentifier(expression)) {
+            addExpressionToTemplate(cssTemplate, t.conditionalExpression(
+                t.binaryExpression(
+                    '===',
+                    t.identifier(expression.name),
+                    t.booleanLiteral(true),
+                ),
+                t.stringLiteral(consequent),
+                t.stringLiteral(alternate),
+            ))
+
+            addQuasiToTemplate(cssTemplate, t.templateElement({raw: '', cooked: ''}))
+        }
+        */
+    }
+}
+
+export function addGrowProp(cssProperties, attribute) {
+    const { value } = attribute
+
+    if (value === null) {
+        addCssProperty(cssProperties, 'flexGrow', t.numericLiteral(1))
+    }
+    else if (t.isJSXExpressionContainer(value)) {
+        const { expression } = value
+
+        if (t.isNumericLiteral(expression)) {
+            addCssProperty(cssProperties, 'flexGrow', expression)
+        }
+        else if (t.isStringLiteral(expression)) {
+            addCssProperty(cssProperties, 'flexGrow', expression)
+        }
+        else if (t.isIdentifier(expression)) {
+            addCssProperty(cssProperties, 'flexGrow', expression)
+        }
+    }
+    else if (t.isStringLiteral(value)) {
+        addCssProperty(cssProperties, 'flexGrow', value)
+    }
+}
