@@ -1,6 +1,6 @@
 {
   "name": "chronstruct-primitives",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "",
   "homepage": "https://github.com/chronstruct/primitives",
   "main": "dist/index.js",
