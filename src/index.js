@@ -10,6 +10,7 @@ module.exports = function(babel) {
 
   return {
     name: "ast-transform", // not required
+    inherits: require("babel-plugin-syntax-jsx"),
     visitor: {
       JSXElement(path) {
         var element = path.node && path.node.openingElement && path.node.openingElement.name
