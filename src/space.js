@@ -1,26 +1,31 @@
-// const printAST = require('ast-pretty-print')
-import {renameTag, addBooleanProperty, addCssProperty, addGrowProp, buildClassNameProp, buildClassNamePropFunction} from "./utils";
-import * as t from 'babel-types'
+'use strict';
 
-const propsToOmit = {
+// var printAST = require('ast-pretty-print')
+var t = require('babel-types');
+var Utils = require('./utils');
+var renameTag = Utils.renameTag,
+    addCssProperty = Utils.addCssProperty,
+    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+
+var propsToOmit = {
   as: true,
 }
 
-const cssProps = {
+var cssProps = {
   size: 'flexBasis',
 }
 
-const defaultCss = {flexGrow: t.numericLiteral(0), flexShrink: t.numericLiteral(0)}
+var defaultCss = {flexGrow: t.numericLiteral(0), flexShrink: t.numericLiteral(0)}
 
-export default function (node) {
+module.exports = function(node) {
   function buildProps(node) {
-      const cssProperties = {...defaultCss}
+      var cssProperties = Object.assign({}, defaultCss)
 
-      const props = []
+      var props = []
 
     if (node.openingElement.attributes != null) {
         node.openingElement.attributes.forEach(attribute => {
-            const name = attribute.name.name
+            var name = attribute.name.name
 
             if (name in propsToOmit) {
                 return
@@ -39,12 +44,12 @@ export default function (node) {
         })
     }
 
-      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
+      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
       //console.log(className)
       className.value.expression.loc = node.loc
 
-      //const cssProperties = className.value.expression.arguments[0].properties
+      //var cssProperties = className.value.expression.arguments[0].properties
 
       props.push(className)
 
@@ -53,10 +58,10 @@ export default function (node) {
 
   /*
   function addCssProp(cssTemplate, attribute, name) {
-    const { value } = attribute
+    var { value } = attribute
 
     if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
+      var { expression } = value
 
       // console.log(printAST(expression));
 

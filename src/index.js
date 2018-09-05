@@ -1,16 +1,18 @@
-// const printAST = require('ast-pretty-print')
-const convertFlex = require('./flex').default
-const convertSpace = require('./space').default
-const convertText = require('./text').default
+'use strict';
 
-export default function (babel) {
-  const { types: t } = babel;
+// var printAST = require('ast-pretty-print')
+var convertFlex = require('./flex')
+var convertSpace = require('./space')
+var convertText = require('./text')
+
+module.exports = function(babel) {
+  var { types: t } = babel;
 
   return {
     name: "ast-transform", // not required
     visitor: {
       JSXElement(path) {
-        const element = path.node && path.node.openingElement && path.node.openingElement.name
+        var element = path.node && path.node.openingElement && path.node.openingElement.name
 
         if (!element) {
           return

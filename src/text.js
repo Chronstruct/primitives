@@ -1,12 +1,19 @@
-// const printAST = require('ast-pretty-print')
-import {renameTag, addBooleanProperty, addCssProperty, addGrowProp, buildClassNameProp, buildClassNamePropFunction} from "./utils";
-import * as t from 'babel-types'
+'use strict';
 
-const propsToOmit = {
+// var printAST = require('ast-pretty-print')
+var t = require('babel-types');
+var Utils = require('./utils');
+var renameTag = Utils.renameTag,
+    addBooleanProperty = Utils.addBooleanProperty,
+    addCssProperty = Utils.addCssProperty,
+    addGrowProp = Utils.addGrowProp,
+    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+
+var propsToOmit = {
   as: true,
 }
 
-const cssProps = {
+var cssProps = {
   align: 'textAlign',
   color: 'color',
   decoration: 'textDecoration',
@@ -22,7 +29,7 @@ const cssProps = {
 
 }
 
-const booleanProps = {
+var booleanProps = {
   antialiased: {
       webkitFontSmoothing: t.stringLiteral('antialiased'),
       mozOsxFontSmoothing: t.stringLiteral('grayscale'),
@@ -52,26 +59,26 @@ const booleanProps = {
 }
 
 // from https://bitsofco.de/the-new-system-font-stack/
-//const defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
-const defaultCss = {
+//var defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
+var defaultCss = {
     'fontFamily': t.stringLiteral('-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif'),
 }
 
-export default function (node) {
+module.exports = function(node) {
   function buildProps(node, defaultCss) {
-      const cssProperties = {...defaultCss}
+      var cssProperties = Object.assign({}, defaultCss)
 
-      const props = []
+      var props = []
 
-      // const css = buildDefaultCssProp(t, defaultCss)
-      //const className = buildClassNameProp(t, defaultCss)
+      // var css = buildDefaultCssProp(t, defaultCss)
+      //var className = buildClassNameProp(t, defaultCss)
       //className.value.expression.loc = node.loc
-      //const cssTemplate = className.value.expression.quasi
-      //const props = [className]
+      //var cssTemplate = className.value.expression.quasi
+      //var props = [className]
 
     if (node.openingElement.attributes != null) {
         node.openingElement.attributes.forEach(attribute => {
-            const name = attribute.name.name
+            var name = attribute.name.name
 
             if (name in propsToOmit) {
                 return
@@ -100,12 +107,12 @@ export default function (node) {
         })
     }
 
-      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
+      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
       //console.log(className)
       className.value.expression.loc = node.loc
 
-      //const cssProperties = className.value.expression.arguments[0].properties
+      //var cssProperties = className.value.expression.arguments[0].properties
 
       props.push(className)
 
@@ -114,10 +121,10 @@ export default function (node) {
 
   /*
   function addCssProp(cssTemplate, attribute, name) {
-    const { value } = attribute
+    var { value } = attribute
 
     if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
+      var { expression } = value
 
       // console.log(printAST(expression));
 
@@ -156,13 +163,13 @@ export default function (node) {
   }
 
   function addBooleanProp(cssTemplate, attribute, name, {consequent, alternate}) {
-    const { value } = attribute
+    var { value } = attribute
 
     if (value === null) {
       addStringToTemplate(cssTemplate, consequent)
     }
     else if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
+      var { expression } = value
 
       if (t.isBooleanLiteral(expression) && expression.value === true) {
         addStringToTemplate(cssTemplate, consequent)
@@ -184,13 +191,13 @@ export default function (node) {
   }
 
   function addGrowProp(cssTemplate, attribute) {
-    const { value } = attribute
+    var { value } = attribute
 
     if (value === null) {
       addStringToTemplate(cssTemplate, 'flex-grow: 1;')
     }
     else if (t.isJSXExpressionContainer(value)) {
-      const { expression } = value
+      var { expression } = value
 
       if (t.isNumericLiteral(expression)) {
         addStringToTemplate(cssTemplate, `flex-grow: ${expression.extra.raw};`)

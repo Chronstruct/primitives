@@ -1,8 +1,9 @@
 // src/__tests__/index-test.js
 const babel = require('babel-core');
-const plugin = require('../');
+const plugin = require('../src/');
 
-const options = { plugins: ["syntax-jsx", plugin.default] }
+
+const options = { plugins: ["syntax-jsx", plugin] }
 
 const defaultCss = `flexGrow: 0,\n  flexShrink: 0`
 
