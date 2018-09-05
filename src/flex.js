@@ -1,12 +1,20 @@
-const printAST = require('ast-pretty-print')
-import {renameTag, addBooleanProperty, addCssProperty, addGrowProp, buildClassNameProp, buildClassNamePropFunction} from "./utils";
-import * as t from 'babel-types'
+'use strict';
 
-const propsToOmit = {
+// var printAST = require('ast-pretty-print')
+var t = require('babel-types');
+var Utils = require('./utils');
+var renameTag = Utils.renameTag,
+    addBooleanProperty = Utils.addBooleanProperty,
+    addCssProperty = Utils.addCssProperty,
+    addGrowProp = Utils.addGrowProp,
+    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+    // buildClassNameProp = Utils.buildClassNameProp,
+
+var propsToOmit = {
   as: true,
 }
 
-const propsToUse = {
+var propsToUse = {
   top: 'top',
   right: 'right',
   bottom: 'bottom',
@@ -50,12 +58,11 @@ const propsToUse = {
   zIndex: 'zIndex',
 }
 
-const flexPropsToUse = {
-  ...propsToUse,
-  direction: 'flexDirection',
-}
+var flexPropsToUse = Object.assign({}, propsToUse, {
+    direction: 'flexDirection'
+});
 
-const booleanProps = {
+var booleanProps = {
   center: {
       alignItems: t.stringLiteral('center'),
       justifyContent: t.stringLiteral('center'),
@@ -89,12 +96,12 @@ const booleanProps = {
   },
 }
 
-const defaultFlexCss = 'display: flex;flex-shrink: 0;align-content: flex-start;position: relative;'
-const defaultColCss = 'display: flex;flex-direction: column;flex-shrink: 0;align-content: flex-start;position: relative;'
-const defaultRowCss = 'display: flex;flex-direction: row;flex-shrink: 0;align-content: flex-start;position: relative;'
+var defaultFlexCss = 'display: flex;flex-shrink: 0;align-content: flex-start;position: relative;'
+var defaultColCss = 'display: flex;flex-direction: column;flex-shrink: 0;align-content: flex-start;position: relative;'
+var defaultRowCss = 'display: flex;flex-direction: row;flex-shrink: 0;align-content: flex-start;position: relative;'
 
 /*
-const defaultFlex = t.objectExpression(
+var defaultFlex = t.objectExpression(
     [
         t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
         t.objectProperty(t.identifier('alignContent'), t.stringLiteral('flexStart')),
@@ -103,7 +110,7 @@ const defaultFlex = t.objectExpression(
     ]
 )
 
-const defaultCol = t.objectExpression(
+var defaultCol = t.objectExpression(
     [
         t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
         t.objectProperty(t.identifier('flexDirection'), t.stringLiteral('column')),
@@ -113,7 +120,7 @@ const defaultCol = t.objectExpression(
     ]
 )
 
-const defaultRow = t.objectExpression(
+var defaultRow = t.objectExpression(
     [
         t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
         t.objectProperty(t.identifier('flexDirection'), t.stringLiteral('row')),
@@ -124,14 +131,14 @@ const defaultRow = t.objectExpression(
 )
 */
 
-const defaultFlex = {
+var defaultFlex = {
     'display': t.stringLiteral('flex'),
     'alignContent': t.stringLiteral('flex-start'),
     'position': t.stringLiteral('relative'),
     'shrink': t.numericLiteral(0),
 }
 
-const defaultCol = {
+var defaultCol = {
     'display': t.stringLiteral('flex'),
     'flexDirection': t.stringLiteral('column'),
     'alignContent': t.stringLiteral('flex-start'),
@@ -139,7 +146,7 @@ const defaultCol = {
     'shrink': t.numericLiteral(0),
 }
 
-const defaultRow = {
+var defaultRow = {
     'display': t.stringLiteral('flex'),
     'flexDirection': t.stringLiteral('row'),
     'alignContent': t.stringLiteral('flex-start'),
@@ -147,19 +154,19 @@ const defaultRow = {
     'shrink': t.numericLiteral(0),
 }
 
-export default function (node, tagName) {
+module.exports = function(node, tagName) {
   function buildProps(node, defaultCss, cssProps) {
-    // const css = buildDefaultCssProp(t, defaultCss)
-      const cssProperties = {...defaultCss}
+    // var css = buildDefaultCssProp(t, defaultCss)
+      var cssProperties = Object.assign({}, defaultCss);
 
-      const props = []
+      var props = []
 
-      //const className = buildClassNamePropFunction(t, cssProperties)
+      //var className = buildClassNamePropFunction(t, cssProperties)
       //className.value.expression.loc = node.loc
 
-    //const cssProperties = className.value.expression.arguments[0].properties
+    //var cssProperties = className.value.expression.arguments[0].properties
 
-    //const props = [className]
+    //var props = [className]
 
     if (node.openingElement.attributes != null) {
         node.openingElement.attributes.forEach(attribute => {
@@ -167,7 +174,7 @@ export default function (node, tagName) {
                 return
             }
 
-            const name = attribute.name.name
+            var name = attribute.name.name
 
             if (name in propsToOmit) {
                 return
@@ -198,12 +205,12 @@ export default function (node, tagName) {
 
       //console.log(cssProperties)
 
-      const className = buildClassNamePropFunction(t, cssProperties, cssProps)
+      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
       //console.log(className)
       className.value.expression.loc = node.loc
 
-      //const cssProperties = className.value.expression.arguments[0].properties
+      //var cssProperties = className.value.expression.arguments[0].properties
 
       props.push(className)
 

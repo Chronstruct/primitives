@@ -1,7 +1,9 @@
-// const printAST = require('ast-pretty-print')
-import * as t from 'babel-types'
+'use strict';
 
-export function buildDefaultCssProp(t, css) {
+// var printAST = require('ast-pretty-print')
+var t = require('babel-types');
+
+function buildDefaultCssProp(t, css) {
   return t.jSXAttribute(
     t.jSXIdentifier('css'),
     t.jSXExpressionContainer(
@@ -34,10 +36,10 @@ export function buildClassNamePropFunction(t, cssObject) {
 }
 */
 
-export function buildClassNamePropFunction(t, cssObject, keyAliases) {
-    const objectProperties =
+function buildClassNamePropFunction(t, cssObject, keyAliases) {
+    var objectProperties =
         Object.keys(cssObject).map(key => {
-            const value = cssObject[key]
+            var value = cssObject[key]
 
             if (!isNaN(key)) {
                 key = `@media screen and (min-width: ${key}px)`
@@ -66,7 +68,7 @@ export function buildClassNamePropFunction(t, cssObject, keyAliases) {
     )
 }
 
-export function buildClassNameProp(t, css) {
+function buildClassNameProp(t, css) {
     return t.jSXAttribute(
         t.jSXIdentifier('className'),
         t.jSXExpressionContainer(
@@ -86,19 +88,19 @@ export function buildClassNameProp(t, css) {
     )
 }
 
-export function addTemplateToTemplate(target, template) {
+function addTemplateToTemplate(target, template) {
   if (template.expressions.length > 0) {
     if (target.expressions.length === target.quasis.length) {
       // safe to just push these
-      target.expressions.push(...template.expressions)
-      target.quasis.push(...template.quasis)
+      target.expressions = target.expressions.concat(template.expressions.slice(0))
+      target.quasis = target.quasis.concat(template.quasis.slice(0))
     }
     else {
-      target.expressions.push(...template.expressions)
+      target.expressions = target.expressions.concat(template.expressions.slice(0))
 
       // concate the first quasi, then push on the rest
       addStringToTemplate(target, template.quasis[0].value.raw)
-      target.quasis.push(...template.quasis.slice(1))
+      target.quasis = target.quasis.concat(template.quasis.slice(1))
     }
   }
   else {
@@ -106,31 +108,31 @@ export function addTemplateToTemplate(target, template) {
   }
 }
 
-export function addStringToTemplate(template, str) {
-  const last = template.quasis.length - 1
+function addStringToTemplate(template, str) {
+  var last = template.quasis.length - 1
 
   template.quasis[last].value.raw = template.quasis[last].value.raw + str
   template.quasis[last].value.cooked = template.quasis[last].value.cooked + str
 }
 
-export function addQuasiToTemplate(template, quasi) {
+function addQuasiToTemplate(template, quasi) {
   template.quasis.push(quasi)
 }
 
-export function addExpressionToTemplate(template, expression) {
+function addExpressionToTemplate(template, expression) {
   template.expressions.push(expression)
 }
 
-export function renameTag(node, defaultTag = 'div') {
+function renameTag(node, defaultTag = 'div') {
   let tagName = defaultTag
 
   if (node.openingElement.attributes != null) {
-    const name = node.openingElement.attributes.find(prop => {
+    var name = node.openingElement.attributes.find(prop => {
       return prop.name && prop.name.name === 'as'
     })
 
     if (name !== undefined) {
-      const val = name.value.value || name.value.expression.value
+      var val = name.value.value || name.value.expression.value
 
       if (val != null) {
         tagName = val
@@ -148,9 +150,9 @@ export function renameTag(node, defaultTag = 'div') {
   }
 }
 
-export function addCssProperty(cssProperties, key, propValue) {
+function addCssProperty(cssProperties, key, propValue) {
     if (t.isJSXExpressionContainer(propValue)) {
-        const {expression} = propValue
+        var {expression} = propValue
 
         if (t.isObjectExpression(expression)) {
             expression.properties.forEach((property) => {
@@ -205,20 +207,20 @@ export function addCssProperty(cssProperties, key, propValue) {
     }
 }
 
-export function addCssProperties(cssProperties, propertiesToAdd) {
+function addCssProperties(cssProperties, propertiesToAdd) {
     Object.keys(propertiesToAdd).forEach(key => {
         addCssProperty(cssProperties, key, propertiesToAdd[key])
     })
 }
 
-export function addBooleanProperty(cssProperties, attribute, booleanProperties) {
-    const { value } = attribute
+function addBooleanProperty(cssProperties, attribute, booleanProperties) {
+    var { value } = attribute
 
     if (value === null) {
         addCssProperties(cssProperties, booleanProperties)
     }
     else if (t.isJSXExpressionContainer(value)) {
-        const { expression } = value
+        var { expression } = value
 
         if (t.isBooleanLiteral(expression) && expression.value === true) {
             addCssProperties(cssProperties, booleanProperties)
@@ -241,14 +243,14 @@ export function addBooleanProperty(cssProperties, attribute, booleanProperties) 
     }
 }
 
-export function addGrowProp(cssProperties, attribute) {
-    const { value } = attribute
+function addGrowProp(cssProperties, attribute) {
+    var { value } = attribute
 
     if (value === null) {
         addCssProperty(cssProperties, 'flexGrow', t.numericLiteral(1))
     }
     else if (t.isJSXExpressionContainer(value)) {
-        const { expression } = value
+        var { expression } = value
 
         if (t.isNumericLiteral(expression)) {
             addCssProperty(cssProperties, 'flexGrow', expression)
@@ -264,3 +266,16 @@ export function addGrowProp(cssProperties, attribute) {
         addCssProperty(cssProperties, 'flexGrow', value)
     }
 }
+
+exports.buildDefaultCssProp = buildDefaultCssProp;
+exports.buildClassNamePropFunction = buildClassNamePropFunction;
+exports.buildClassNameProp = buildClassNameProp;
+exports.addTemplateToTemplate = addTemplateToTemplate;
+exports.addStringToTemplate = addStringToTemplate;
+exports.addQuasiToTemplate = addQuasiToTemplate;
+exports.addExpressionToTemplate = addExpressionToTemplate;
+exports.renameTag = renameTag;
+exports.addCssProperty = addCssProperty;
+exports.addCssProperties = addCssProperties;
+exports.addBooleanProperty = addBooleanProperty;
+exports.addGrowProp = addGrowProp;
