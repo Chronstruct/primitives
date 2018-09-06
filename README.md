@@ -7,6 +7,58 @@ Custom semantic primitives for **developers**:
 - `<space />`
 - `<text />`
 
+## Why?
+Seminatic html is great for users and readers. It better describes the intent and type of a tag. These primitives are semantic for us **developers**. 
+
+```jsx
+<col
+  as='main"'
+  height={200}
+  width={400}
+>
+  <view
+    as='section'
+    grow
+    style={{
+      backgroundColor: 'red'
+    }}
+  />
+
+  <row
+    as='section'
+  >
+    <view
+      padding={20}
+      marginTop={10}
+      zIndex={100}
+    />
+    <view
+      width='20%'
+      minWidth={200}
+    />
+  </row>
+  
+  <space size={20} />
+  <view
+    as='footer'
+    style={{
+      backgroundColor: 'blue'
+    }}
+  />
+</col>
+```
+
+- See that `<col>` tag? That means you should read it's children top-down. 
+- See that `<row>` tag? That means you should instead read it left-right.
+- See that `<space/>` tag? It is only there to take up space.
+
+Of course, there are more benefits than just being semantic to developers, they also allow us more streamlined APIS for dealing with `text`, `image`s, etc. And all of this is done in your `.js`, on the specific component as first-class `props`.
+
+One last benefit to mention: *separation of concerns*. Layout components expose geometry-related styles as props. All cosmetic styles are added with the `styles` prop. These are all extracted out to static `.css` and auto-imported using [linaria](https://github.com/callstack/linaria). For dynamic styles, simply use `inlineStyles`.
+
+## Getting started
+`yarn add chronstruct-primitives`
+
 Usage note: Requires [babel\-plugin\-object\-styles\-to\-template](https://github.com/satya164/babel-plugin-object-styles-to-template) and [linaria](https://github.com/callstack/linaria). See [starter](https://github.com/Chronstruct/static-starter/blob/master/.babelrc) for an example.
 
 Also, if you'd like to auto-add `import {css} from 'linaria'`, use:
