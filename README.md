@@ -8,7 +8,7 @@ Custom semantic primitives for **developers**:
 - `<text />`
 
 ## Why?
-Seminatic html is great for users and readers. It better describes the intent and type of a tag. These primitives are semantic for us **developers**. 
+*Seminatic* html is great for users, screen readers, and SEO. It better describes the intent and type of a tag. These primitives are *semantic* for us **developers**. 
 
 ```jsx
 <col
@@ -52,7 +52,7 @@ Seminatic html is great for users and readers. It better describes the intent an
 - See that `<row>` tag? That means you should instead read it left-right.
 - See that `<space/>` tag? It is only there to take up space.
 
-Of course, there are more benefits than just being semantic to developers, they also allow us more streamlined APIS for dealing with `text`, `image`s, etc. And all of this is done in your `.js`, on the specific component as first-class `props`.
+Of course, there are more benefits than just being semantic to developers, these primitives also give us streamlined APIS for dealing with `text`, `image`s, etc. And all of this is done in your `.js`, on the specific component as first-class `props`.
 
 One last benefit to mention: *separation of concerns*. Layout components expose geometry-related styles as props. All cosmetic styles are added with the `styles` prop. These are all extracted out to static `.css` and auto-imported using [linaria](https://github.com/callstack/linaria). For dynamic styles, simply use `inlineStyles`.
 
