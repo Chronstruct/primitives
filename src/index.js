@@ -13,11 +13,12 @@ module.exports = function(babel) {
     visitor: {
       Program: {
         enter(path, state) {
-          // has not been added, and does not already exist
-          if (state.hasAddedImport || path.scope.hasBinding('css')) {
+          // option set, has not been added, and does not already exist
+          if (!state.opts.autoImport || state.hasAddedImport || path.scope.hasBinding('css')) {
             return
           }
           
+          // add import
           const identifier = t.identifier('css');
           const importSpecifier = t.importSpecifier(identifier, identifier);
           const importDeclaration = t.importDeclaration([importSpecifier], t.stringLiteral('linaria'));
