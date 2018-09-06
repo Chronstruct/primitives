@@ -9,10 +9,24 @@ module.exports = function(babel) {
   var { types: t } = babel;
 
   return {
-    name: "ast-transform", // not required
     inherits: require("babel-plugin-syntax-jsx"),
     visitor: {
-      JSXElement(path) {
+      Program: {
+        enter(path, state) {
+          // option set, has not been added, and does not already exist
+          if (!state.opts.autoImport || state.hasAddedImport || path.scope.hasBinding('css')) {
+            return
+          }
+          
+          // add import
+          const identifier = t.identifier('css');
+          const importSpecifier = t.importSpecifier(identifier, identifier);
+          const importDeclaration = t.importDeclaration([importSpecifier], t.stringLiteral('linaria'));
+          path.node.body.unshift(importDeclaration);
+          state.hasAddedImport = true
+        },
+      },
+      JSXElement(path, state) {
         var element = path.node && path.node.openingElement && path.node.openingElement.name
 
         if (!element) {
@@ -34,7 +48,7 @@ module.exports = function(babel) {
             convertText(path.node)
             break
         }
-      }
+      }, 
     }
-  };
+  }
 }
