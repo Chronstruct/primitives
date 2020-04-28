@@ -1,7 +1,7 @@
 'use strict';
 
 // var printAST = require('ast-pretty-print')
-var t = require('babel-types');
+var t = require('@babel/types');
 
 function buildDefaultCssProp(t, css) {
   return t.jSXAttribute(

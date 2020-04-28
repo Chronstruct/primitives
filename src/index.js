@@ -9,7 +9,21 @@ module.exports = function(babel) {
   var { types: t } = babel;
 
   return {
-    inherits: require("babel-plugin-syntax-jsx"),
+    // inherits @babel/plugin-syntax-jsx
+    // https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-jsx/src/index.js#L9
+    manipulateOptions(opts, parserOpts) {
+      // If the Typescript plugin already ran, it will have decided whether
+      // or not this is a TSX file.
+      if (
+        parserOpts.plugins.some(
+          p => (Array.isArray(p) ? p[0] : p) === "typescript",
+        )
+      ) {
+        return;
+      }
+
+      parserOpts.plugins.push("jsx");
+    },
     visitor: {
       Program: {
         enter(path, state) {

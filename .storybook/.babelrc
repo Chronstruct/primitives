@@ -3,20 +3,16 @@
 // Preset ordering is reversed (last to first).
 {
     "plugins": [
-      "object-styles-to-template",
-  
-      "../src/index"
+      "./src/index.js",
+      "object-styles-to-template"
+
 
     // "transform-object-rest-spread",
     // "transform-es2015-modules-commonjs"
     ],
     "presets": [
-      "es2015",
-      "react",
-  
-      // class properties and beyond
-      "stage-2",
-
+      "@babel/preset-env",
+      "@babel/preset-react",
       "linaria/babel"
     ]
   }

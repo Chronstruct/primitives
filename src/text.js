@@ -1,7 +1,7 @@
 'use strict';
 
 // var printAST = require('ast-pretty-print')
-var t = require('babel-types');
+var t = require('@babel/types');
 var Utils = require('./utils');
 var renameTag = Utils.renameTag,
     addBooleanProperty = Utils.addBooleanProperty,

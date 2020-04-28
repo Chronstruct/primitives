@@ -1,8 +1,8 @@
 // src/__tests__/index-test.js
-const babel = require('babel-core');
+const babel = require('@babel/core');
 const plugin = require('../src/');
 
-const options = { plugins: ["syntax-jsx", plugin] }
+const options = { plugins: ["@babel/plugin-syntax-jsx", plugin] }
 
 const defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
 

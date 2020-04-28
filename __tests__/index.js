@@ -1,10 +1,13 @@
 const path = require('path');
-const tester = require('babel-plugin-tester');
+const tester = require('babel-plugin-tester').default;
 
 // No options
 tester({
   plugin: require('../src/index'),
   pluginName: 'chronstruct-primitives',
+  babelOptions: {
+    babelrc: true,
+  },
   fixtures: path.join(__dirname, '..', '__fixtures__', 'no-options'),
 });
 
