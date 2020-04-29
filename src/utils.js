@@ -2,6 +2,8 @@
 
 // var printAST = require('ast-pretty-print')
 var t = require('@babel/types');
+var objectStylesToTemplate = require('./objectStylesToTemplate')
+
 
 function buildDefaultCssProp(t, css) {
   return t.jSXAttribute(
@@ -58,12 +60,13 @@ function buildClassNamePropFunction(t, cssObject, keyAliases) {
     return t.jSXAttribute(
         t.jSXIdentifier('className'),
         t.jSXExpressionContainer(
-            t.callExpression(
-                t.identifier('css'),
-                [
-                    t.objectExpression(objectProperties)
-                ]
-            )
+            objectStylesToTemplate(objectProperties)
+            // t.callExpression(
+            //     t.identifier('css'),
+            //     [
+            //         t.objectExpression(objectProperties)
+            //     ]
+            // )
         )
     )
 }

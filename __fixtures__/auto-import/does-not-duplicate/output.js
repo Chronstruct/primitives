@@ -2,11 +2,11 @@ import { css } from "linaria";
 
 const something = () => (
   <div
-    className={css({
-      display: "flex",
-      alignContent: "flex-start",
-      position: "relative",
-      flexShrink: 0,
-    })}
+    className={css`
+      display: flex;
+      align-content: flex-start;
+      position: relative;
+      flex-shrink: 0;
+    `}
   />
 );
