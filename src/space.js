@@ -1,59 +1,69 @@
-'use strict';
+"use strict"
 
 // var printAST = require('ast-pretty-print')
-var t = require('@babel/types');
-var Utils = require('./utils');
+var t = require("@babel/types")
+var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-    addCssProperty = Utils.addCssProperty,
-    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+  addCssProperty = Utils.addCssProperty,
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
 var propsToOmit = {
   as: true,
 }
 
 var cssProps = {
-  size: 'flexBasis',
+  size: "flexBasis",
 }
 
-var defaultCss = {flexGrow: t.numericLiteral(0), flexShrink: t.numericLiteral(0)}
+var defaultCss = {
+  flexGrow: t.numericLiteral(0),
+  flexShrink: t.numericLiteral(0),
+}
 
-module.exports = function(node) {
+module.exports = function (node) {
   function buildProps(node) {
-      var cssProperties = Object.assign({}, defaultCss)
+    var cssProperties = Object.assign({}, defaultCss)
 
-      var props = []
+    var props = []
 
     if (node.openingElement.attributes != null) {
-        node.openingElement.attributes.forEach(attribute => {
-            var name = attribute.name.name
+      node.openingElement.attributes.forEach((attribute) => {
+        var name = attribute.name.name
 
-            if (name in propsToOmit) {
-                return
-            }
-            else if (name === 'style') {
-                attribute.value.expression.properties.forEach(property => {
-                    addCssProperty(cssProperties, property.key.name, property.value, cssProps)
-                })
-            }
-            else if (name in cssProps) {
-                addCssProperty(cssProperties, cssProps[name], attribute.value, cssProps)
-            }
-            else {
-                props.push(attribute)
-            }
-        })
+        if (name in propsToOmit) {
+          return
+        } else if (name === "style") {
+          attribute.value.expression.properties.forEach((property) => {
+            addCssProperty(
+              cssProperties,
+              property.key.name,
+              property.value,
+              cssProps
+            )
+          })
+        } else if (name in cssProps) {
+          addCssProperty(
+            cssProperties,
+            cssProps[name],
+            attribute.value,
+            cssProps
+          )
+        } else {
+          props.push(attribute)
+        }
+      })
     }
 
-      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
-      //console.log(className)
-      className.value.expression.loc = node.loc
+    //console.log(className)
+    className.value.expression.loc = node.loc
 
-      //var cssProperties = className.value.expression.arguments[0].properties
+    //var cssProperties = className.value.expression.arguments[0].properties
 
-      props.push(className)
+    props.push(className)
 
-      return props
+    return props
   }
 
   /*

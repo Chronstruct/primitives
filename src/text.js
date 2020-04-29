@@ -1,58 +1,57 @@
-'use strict';
+"use strict"
 
 // var printAST = require('ast-pretty-print')
-var t = require('@babel/types');
-var Utils = require('./utils');
+var t = require("@babel/types")
+var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-    addBooleanProperty = Utils.addBooleanProperty,
-    addCssProperty = Utils.addCssProperty,
-    addGrowProp = Utils.addGrowProp,
-    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+  addBooleanProperty = Utils.addBooleanProperty,
+  addCssProperty = Utils.addCssProperty,
+  addGrowProp = Utils.addGrowProp,
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
 var propsToOmit = {
   as: true,
 }
 
 var cssProps = {
-  align: 'textAlign',
-  color: 'color',
-  decoration: 'textDecoration',
-  decorationColor: 'textDecorationColor',
-  font: 'fontFamily',
-  height: 'lineHeight',
-  size: 'fontSize',
-  spacing: 'letterSpacing',
-  transform: 'textTransform',
-  weight: 'fontWeight',
+  align: "textAlign",
+  color: "color",
+  decoration: "textDecoration",
+  decorationColor: "textDecorationColor",
+  font: "fontFamily",
+  height: "lineHeight",
+  size: "fontSize",
+  spacing: "letterSpacing",
+  transform: "textTransform",
+  weight: "fontWeight",
   // ellipsis
   // underline
-
 }
 
 var booleanProps = {
   antialiased: {
-      webkitFontSmoothing: t.stringLiteral('antialiased'),
-      mozOsxFontSmoothing: t.stringLiteral('grayscale'),
+    webkitFontSmoothing: t.stringLiteral("antialiased"),
+    mozOsxFontSmoothing: t.stringLiteral("grayscale"),
     //consequent: '-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;',
     //alternate: '',
   },
   italic: {
-      fontStyle: t.stringLiteral('italic'),
+    fontStyle: t.stringLiteral("italic"),
     //consequent: 'font-style: italic;',
     //alternate: '',
   },
   center: {
-      textAlign: t.stringLiteral('center'),
+    textAlign: t.stringLiteral("center"),
     //consequent: 'text-align: center;',
     //alternate: '',
   },
   bold: {
-      fontWeight: t.stringLiteral('bold'),
+    fontWeight: t.stringLiteral("bold"),
     //consequent: 'font-weight: bold;',
     //alternate: '',
   },
   uppercase: {
-      textTransform: t.stringLiteral('uppercase'),
+    textTransform: t.stringLiteral("uppercase"),
     //consequent: 'text-transform: uppercase;',
     //alternate: '',
   },
@@ -61,62 +60,58 @@ var booleanProps = {
 // from https://bitsofco.de/the-new-system-font-stack/
 //var defaultCss = 'font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;'
 var defaultCss = {
-    'fontFamily': t.stringLiteral('-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif'),
+  fontFamily: t.stringLiteral(
+    "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+  ),
 }
 
-module.exports = function(node) {
+module.exports = function (node) {
   function buildProps(node, defaultCss) {
-      var cssProperties = Object.assign({}, defaultCss)
+    var cssProperties = Object.assign({}, defaultCss)
 
-      var props = []
+    var props = []
 
-      // var css = buildDefaultCssProp(t, defaultCss)
-      //var className = buildClassNameProp(t, defaultCss)
-      //className.value.expression.loc = node.loc
-      //var cssTemplate = className.value.expression.quasi
-      //var props = [className]
+    // var css = buildDefaultCssProp(t, defaultCss)
+    //var className = buildClassNameProp(t, defaultCss)
+    //className.value.expression.loc = node.loc
+    //var cssTemplate = className.value.expression.quasi
+    //var props = [className]
 
     if (node.openingElement.attributes != null) {
-        node.openingElement.attributes.forEach(attribute => {
-            var name = attribute.name.name
+      node.openingElement.attributes.forEach((attribute) => {
+        var name = attribute.name.name
 
-            if (name in propsToOmit) {
-                return
-            }
-            else if (name === 'style') {
-                attribute.value.expression.properties.forEach(property => {
-                    addCssProperty(cssProperties, property.key.name, property.value)
-                })
-            }
-            else if (name === 'inlineStyle') {
-                attribute.name.name = 'style'
-                props.push(attribute)
-            }
-            else if (name in cssProps) {
-                addCssProperty(cssProperties, cssProps[name], attribute.value)
-            }
-            else if (name in booleanProps) {
-                addBooleanProperty(cssProperties, attribute, booleanProps[name])
-            }
-            else if (name === 'grow') {
-                addGrowProp(cssProperties, attribute)
-            }
-            else {
-                props.push(attribute)
-            }
-        })
+        if (name in propsToOmit) {
+          return
+        } else if (name === "style") {
+          attribute.value.expression.properties.forEach((property) => {
+            addCssProperty(cssProperties, property.key.name, property.value)
+          })
+        } else if (name === "inlineStyle") {
+          attribute.name.name = "style"
+          props.push(attribute)
+        } else if (name in cssProps) {
+          addCssProperty(cssProperties, cssProps[name], attribute.value)
+        } else if (name in booleanProps) {
+          addBooleanProperty(cssProperties, attribute, booleanProps[name])
+        } else if (name === "grow") {
+          addGrowProp(cssProperties, attribute)
+        } else {
+          props.push(attribute)
+        }
+      })
     }
 
-      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var className = buildClassNamePropFunction(t, cssProperties, cssProps)
 
-      //console.log(className)
-      className.value.expression.loc = node.loc
+    //console.log(className)
+    className.value.expression.loc = node.loc
 
-      //var cssProperties = className.value.expression.arguments[0].properties
+    //var cssProperties = className.value.expression.arguments[0].properties
 
-      props.push(className)
+    props.push(className)
 
-      return props
+    return props
   }
 
   /*
@@ -217,6 +212,6 @@ module.exports = function(node) {
   }
   */
 
-  renameTag(node, 'span')
+  renameTag(node, "span")
   node.openingElement.attributes = buildProps(node, defaultCss)
 }

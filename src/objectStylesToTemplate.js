@@ -1,8 +1,8 @@
 /* @flow */
 // forked from https://github.com/satya164/babel-plugin-object-styles-to-template
-var t = require('@babel/types');
+var t = require("@babel/types")
 
-const dashify = text => text.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const dashify = (text) => text.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase()
 const unitless = {
   animationIterationCount: true,
   borderImageOutset: true,
@@ -47,87 +47,84 @@ const unitless = {
   strokeMiterlimit: true,
   strokeOpacity: true,
   strokeWidth: true,
-};
+}
 
-module.exports = function(styleObject) {
-    const quasis = [];
-    const expressions = [];
-    
-    let text = '';
-    
-    const indentation = '  ';
-    const finalize = (expr, str) => {
-        quasis.push(t.templateElement({ raw: text }));
-        expressions.push(expr);
-        text = str;
-    };
+module.exports = function (styleObject) {
+  const quasis = []
+  const expressions = []
 
-    const serialize = (styles, level = 1) => {
-        const indent = indentation.repeat(level);
+  let text = ""
 
-        styles.forEach((prop, i) => {
-          if (t.isObjectExpression(prop.value)) {
-            if (i !== 0) {
-              text += '\n';
-            }
+  const indentation = "  "
+  const finalize = (expr, str) => {
+    quasis.push(t.templateElement({ raw: text }))
+    expressions.push(expr)
+    text = str
+  }
 
-            if (prop.computed) {
-              text += `\n${indent}`;
-              finalize(prop.key, ' {');
-            } else {
-              let key;
+  const serialize = (styles, level = 1) => {
+    const indent = indentation.repeat(level)
 
-              if (t.isIdentifier(prop.key)) {
-                key = prop.key.name;
-              } else {
-                key = prop.key.value;
-              }
+    styles.forEach((prop, i) => {
+      if (t.isObjectExpression(prop.value)) {
+        if (i !== 0) {
+          text += "\n"
+        }
 
-              text += `\n${indent}${key} {`;
-            }
+        if (prop.computed) {
+          text += `\n${indent}`
+          finalize(prop.key, " {")
+        } else {
+          let key
 
-            serialize(prop.value.properties, level + 1);
-            text += `\n${indent}}`;
-            return;
-          }
-
-          let key;
-
-          if (prop.computed) {
-            text += `\n${indent}`;
-            finalize(prop.key, ': ');
+          if (t.isIdentifier(prop.key)) {
+            key = prop.key.name
           } else {
-            if (t.isIdentifier(prop.key)) {
-              key = prop.key.name;
-            } else {
-              key = prop.key.value;
-            }
-
-            text += `\n${indent}${dashify(key)}: `;
+            key = prop.key.value
           }
 
-          if (
-            t.isStringLiteral(prop.value) ||
-            t.isNumericLiteral(prop.value)
-          ) {
-            let value = prop.value.value;
+          text += `\n${indent}${key} {`
+        }
 
-            if (t.isNumericLiteral(prop.value) && key && !unitless[key]) {
-              value += 'px';
-            }
+        serialize(prop.value.properties, level + 1)
+        text += `\n${indent}}`
+        return
+      }
 
-            text += `${value};`;
-          } else {
-            finalize(prop.value, ';');
-          }
-        });
-      };
+      let key
 
-      serialize(styleObject);
-      quasis.push(t.templateElement({ raw: `${text}\n` }));
+      if (prop.computed) {
+        text += `\n${indent}`
+        finalize(prop.key, ": ")
+      } else {
+        if (t.isIdentifier(prop.key)) {
+          key = prop.key.name
+        } else {
+          key = prop.key.value
+        }
 
-      return t.taggedTemplateExpression(
-        t.identifier('css'),
-        t.templateLiteral(quasis, expressions)
-      )
+        text += `\n${indent}${dashify(key)}: `
+      }
+
+      if (t.isStringLiteral(prop.value) || t.isNumericLiteral(prop.value)) {
+        let value = prop.value.value
+
+        if (t.isNumericLiteral(prop.value) && key && !unitless[key]) {
+          value += "px"
+        }
+
+        text += `${value};`
+      } else {
+        finalize(prop.value, ";")
+      }
+    })
+  }
+
+  serialize(styleObject)
+  quasis.push(t.templateElement({ raw: `${text}\n` }))
+
+  return t.taggedTemplateExpression(
+    t.identifier("css"),
+    t.templateLiteral(quasis, expressions)
+  )
 }
