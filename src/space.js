@@ -14,23 +14,12 @@ var propsToOmit = {
 
 var cssProps = {
   size: "flexBasis",
-  // grow: "flexGrow",
-  // shrink: "flexShrink",
 }
 
 var booleanProps = {
   grow: "flexGrow",
   shrink: "flexShrink",
 }
-
-// var booleanProps = {
-//   grow: {
-//     flexGrow: t.numericLiteral(1),
-//   },
-//   shrink: {
-//     flexShrink: t.numericLiteral(1),
-//   },
-// }
 
 var defaultCss = {
   flexGrow: t.numericLiteral(0),
@@ -66,10 +55,16 @@ module.exports = function (node) {
             cssProps
           )
         } else if (name in booleanProps) {
-          addBooleanProperty(cssProperties, attribute, booleanProps[name], {
-            true: t.numericLiteral(1),
-            false: t.numericLiteral(0),
-          })
+          addBooleanProperty(
+            cssProperties,
+            attribute,
+            booleanProps[name],
+            {
+              true: t.numericLiteral(1),
+              false: t.numericLiteral(0),
+            },
+            { allowNumber: true }
+          )
         } else {
           props.push(attribute)
         }

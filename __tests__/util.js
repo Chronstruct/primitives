@@ -8,6 +8,8 @@ var renameTag = Utils.renameTag,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
+//TODO: test renameTag()
+
 it("addCssProperty with NumericLiteral", () => {
   var input = {}
   var key = "flexShrink"
@@ -43,10 +45,10 @@ it("addCssProperty with ObjectExpression", () => {
     }
    */
   var expectedOutput = {
+    [key]: t.numericLiteral(20),
     "@media screen and (min-width: 200px)": t.objectExpression([
-      t.objectProperty(t.identifier("size"), t.numericLiteral(200)),
+      t.objectProperty(t.identifier(key), t.numericLiteral(200)),
     ]),
-    size: t.numericLiteral(20),
   }
 
   addCssProperty(input, key, value)
@@ -124,7 +126,21 @@ it("addBooleanProperty `grow`", () => {
   expect(input).toStrictEqual(expectedOutput)
 })
 
-it(`addBooleanProperty grow="1" NOT SUPPORTED`, () => {
+it(`addBooleanProperty grow="string" does nothing by default`, () => {
+  var input = {}
+  var key = "flexGrow"
+  var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
+  var value = t.stringLiteral("1")
+  var attribute = t.jsxAttribute(t.jsxIdentifier("grow"), value)
+
+  var expectedOutput = {}
+
+  addBooleanProperty(input, attribute, key, valueMap)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+it(`addBooleanProperty grow="string" does something when enabled`, () => {
   var input = {}
   var key = "flexGrow"
   var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
@@ -133,18 +149,33 @@ it(`addBooleanProperty grow="1" NOT SUPPORTED`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, attribute, key, valueMap, { allowString: true })
 
-  // expect(input).toStrictEqual(expectedOutput)
-
-  expect(input).toStrictEqual(input)
+  expect(input).toStrictEqual(expectedOutput)
 })
 
-it(`addBooleanProperty grow={"1"} NOT SUPPORTED`, () => {
+it(`addBooleanProperty grow={"string"} does nothing by default`, () => {
   var input = {}
   var key = "flexGrow"
   var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
-  var value = t.stringLiteral("1")
+  var value = t.stringLiteral("string")
+  var attribute = t.jsxAttribute(
+    t.jsxIdentifier("grow"),
+    t.jsxExpressionContainer(value)
+  )
+
+  var expectedOutput = {}
+
+  addBooleanProperty(input, attribute, key, valueMap)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+it(`addBooleanProperty grow={"string"} does something when enabled`, () => {
+  var input = {}
+  var key = "flexGrow"
+  var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
+  var value = t.stringLiteral("string")
   var attribute = t.jsxAttribute(
     t.jsxIdentifier("grow"),
     t.jsxExpressionContainer(value)
@@ -152,14 +183,29 @@ it(`addBooleanProperty grow={"1"} NOT SUPPORTED`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, attribute, key, valueMap, { allowString: true })
 
-  // expect(input).toStrictEqual(expectedOutput)
-
-  expect(input).toStrictEqual(input)
+  expect(input).toStrictEqual(expectedOutput)
 })
 
-it(`addBooleanProperty grow={1}  NOT SUPPORTED`, () => {
+it(`addBooleanProperty grow={1} does nothing by default`, () => {
+  var input = {}
+  var key = "flexGrow"
+  var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
+  var value = t.numericLiteral(1)
+  var attribute = t.jsxAttribute(
+    t.jsxIdentifier("grow"),
+    t.jsxExpressionContainer(value)
+  )
+
+  var expectedOutput = {}
+
+  addBooleanProperty(input, attribute, key, valueMap)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+it(`addBooleanProperty grow={1} does something when enabled`, () => {
   var input = {}
   var key = "flexGrow"
   var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
@@ -171,11 +217,9 @@ it(`addBooleanProperty grow={1}  NOT SUPPORTED`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, attribute, key, valueMap, { allowNumber: true })
 
-  // expect(input).toStrictEqual(expectedOutput)
-
-  expect(input).toStrictEqual(input)
+  expect(input).toStrictEqual(expectedOutput)
 })
 
 it(`addBooleanProperty grow={true}`, () => {
@@ -209,12 +253,37 @@ it(`addBooleanProperty grow={{'': true, 'hover': false}}`, () => {
   )
 
   var expectedOutput = {
+    [key]: t.numericLiteral(1),
     hover: t.objectExpression([
       t.objectProperty(t.identifier(key), t.numericLiteral(0)),
     ]),
-    [key]: t.numericLiteral(1),
   }
   addBooleanProperty(input, attribute, key, valueMap)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+it(`addBooleanProperty grow={{'': 1, 'hover': false}}`, () => {
+  var input = {}
+  var key = "flexGrow"
+  var valueMap = { true: t.numericLiteral(1), false: t.numericLiteral(0) }
+  var attribute = t.jsxAttribute(
+    t.jsxIdentifier("grow"),
+    t.jsxExpressionContainer(
+      t.objectExpression([
+        t.objectProperty(t.stringLiteral(""), t.numericLiteral(1)),
+        t.objectProperty(t.stringLiteral("hover"), t.booleanLiteral(false)),
+      ])
+    )
+  )
+
+  var expectedOutput = {
+    [key]: t.numericLiteral(1),
+    hover: t.objectExpression([
+      t.objectProperty(t.identifier(key), t.numericLiteral(0)),
+    ]),
+  }
+  addBooleanProperty(input, attribute, key, valueMap, { allowNumber: true })
 
   expect(input).toStrictEqual(expectedOutput)
 })

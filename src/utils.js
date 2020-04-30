@@ -199,7 +199,9 @@ function addCssProperty(cssProperties, key, propValue, valueMap) {
   } else if (t.isObjectExpression(propValue)) {
     propValue.properties.forEach((property) => {
       const value =
-        valueMap != null ? valueMap[property.value.value] : property.value.value
+        property.value.value in valueMap
+          ? valueMap[property.value.value]
+          : property.value
 
       // base case
       if (property.key.value === "") {
@@ -236,15 +238,15 @@ function addCssProperties(cssProperties, propertiesToAdd) {
 
 /**
  * @param {Object} cssProperties
- * @param {string} attribute
+ * @param {JSXAttribute} jsxAttribute
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
-function addBooleanPropertySet(cssProperties, attribute, propertiesToAdd) {
-  var { value } = attribute
+function addBooleanPropertySet(cssProperties, jsxAttribute, propertiesToAdd) {
+  var { value } = jsxAttribute
   //   console.log("attribute", attribute)
 
-  if (value === null) {
+  if (isBooleanProp(jsxAttribute)) {
     addCssProperties(cssProperties, propertiesToAdd)
   } else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
@@ -270,35 +272,46 @@ function addBooleanPropertySet(cssProperties, attribute, propertiesToAdd) {
   }
 }
 
+// const defaultAddBooleanPropertyConfig = {
+//   allowString: false,
+//   allowNumber: false,
+// }
 /**
  * @param {Object} cssProperties
  * @param {JSXAttribute} jsxAttribute
  * @param {string} key - key to apply to cssProperties
  * @param {{true: any, false: any}} valueMap - used to convert from boolean values
+ * @param {{allowString: boolean, allowNumber: boolean}} config - which non-boolean values are allowed
  * @return {void}
  */
-function addBooleanProperty(cssProperties, jsxAttribute, key, valueMap) {
+function addBooleanProperty(
+  cssProperties,
+  jsxAttribute,
+  key,
+  valueMap,
+  config
+) {
   var { value } = jsxAttribute
 
   if (isBooleanProp(jsxAttribute)) {
     addCssProperty(cssProperties, key, valueMap[true])
-  } else if (isStringProp(jsxAttribute)) {
+  }
+  // e.g. grow="1" (NOT SUPPORTED by default)
+  else if (config && config.allowString && isStringProp(jsxAttribute)) {
     addCssProperty(cssProperties, key, value)
   } else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
-    // e.g. grow={1} NOT SUPPORTED
-    // if (t.isNumericLiteral(expression)) {
-    //   addCssProperty(cssProperties, key, expression)
-    // }
-
-    // e.g. grow={"1"}  NOT SUPPORTED
-    // else if (t.isStringLiteral(expression)) {
-    //   addCssProperty(cssProperties, key, expression)
-    // }
-
+    // e.g. grow={1} (NOT SUPPORTED by default)
+    if (config && config.allowNumber && t.isNumericLiteral(expression)) {
+      addCssProperty(cssProperties, key, expression)
+    }
+    // e.g. grow={"1"} (NOT SUPPORTED by default)
+    else if (config && config.allowString && t.isStringLiteral(expression)) {
+      addCssProperty(cssProperties, key, expression)
+    }
     // e.g. grow={someVar}
-    if (t.isIdentifier(expression)) {
+    else if (t.isIdentifier(expression)) {
       addCssProperty(cssProperties, key, expression)
     }
     // e.g. grow={true}
