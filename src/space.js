@@ -4,6 +4,7 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
+  addBooleanProperty = Utils.addBooleanProperty,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
@@ -13,6 +14,17 @@ var propsToOmit = {
 
 var cssProps = {
   size: "flexBasis",
+  // grow: "flexGrow",
+  // shrink: "flexShrink",
+}
+
+var booleanProps = {
+  grow: {
+    flexGrow: t.numericLiteral(1),
+  },
+  shrink: {
+    flexShrink: t.numericLiteral(1),
+  },
 }
 
 var defaultCss = {
@@ -48,6 +60,12 @@ module.exports = function (node) {
             attribute.value,
             cssProps
           )
+        } else if (name in booleanProps) {
+          // console.log(`cssProperties: ${cssProperties}`)
+          // console.log("attribute", attribute)
+          // console.log("attribute.value.expression", attribute.value.expression)
+          // console.log("booleanProperties", booleanProps[name])
+          addBooleanProperty(cssProperties, attribute, booleanProps[name])
         } else {
           props.push(attribute)
         }

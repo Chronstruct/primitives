@@ -35,8 +35,14 @@ export function buildClassNamePropFunction(t, cssObject) {
         )
     )
 }
-*/
 
+*/
+/**
+ * @param {babel.types} t
+ * @param {Object} cssObject
+ * @param {Object} keyAliases
+ * @return {any} className prop with styles
+ */
 function buildClassNamePropFunction(t, cssObject, keyAliases) {
   var objectProperties = Object.keys(cssObject).map((key) => {
     var value = cssObject[key]
@@ -147,7 +153,21 @@ function renameTag(node, defaultTag = "div") {
   }
 }
 
+/**
+ * @param {Object} cssProperties
+ * @param {string} key
+ * @param {any} propValue
+ * @return {any} className prop with styles
+ */
 function addCssProperty(cssProperties, key, propValue) {
+  //   console.log("cssProperties", cssProperties)
+  //   console.log("key", key)
+  //   console.log("propValue", propValue)
+  //   console.log(
+  //     "propValue.expression.properties",
+  //     propValue.expression.properties
+  //   )
+
   if (t.isJSXExpressionContainer(propValue)) {
     var { expression } = propValue
 
@@ -200,22 +220,37 @@ function addCssProperty(cssProperties, key, propValue) {
   }
 }
 
+/**
+ * @param {Object} cssProperties
+ * @param {Object} propertiesToAdd
+ * @return {any} className prop with styles
+ */
 function addCssProperties(cssProperties, propertiesToAdd) {
+  //   console.log(propertiesToAdd)
   Object.keys(propertiesToAdd).forEach((key) => {
+    // console.log(key)
     addCssProperty(cssProperties, key, propertiesToAdd[key])
   })
 }
 
-function addBooleanProperty(cssProperties, attribute, booleanProperties) {
+/**
+ * @param {Object} cssProperties
+ * @param {string} attribute
+ * @param {Object} propertiesToAdd
+ * @return {any} className prop with styles
+ */
+// todo: rename to addBooleanPropertySet
+function addBooleanProperty(cssProperties, attribute, propertiesToAdd) {
   var { value } = attribute
+  //   console.log("attribute", attribute)
 
   if (value === null) {
-    addCssProperties(cssProperties, booleanProperties)
+    addCssProperties(cssProperties, propertiesToAdd)
   } else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
 
     if (t.isBooleanLiteral(expression) && expression.value === true) {
-      addCssProperties(cssProperties, booleanProperties)
+      addCssProperties(cssProperties, propertiesToAdd)
     }
     /*
         else if (t.isIdentifier(expression)) {
@@ -235,24 +270,51 @@ function addBooleanProperty(cssProperties, attribute, booleanProperties) {
   }
 }
 
-function addGrowProp(cssProperties, attribute) {
-  var { value } = attribute
+/**
+ * @param {Object} cssProperties
+ * @param {JSXAttribute} prop
+ * @param {Object} propertiesToAdd
+ * @return {any} className prop with styles
+ */
+// todo: rename to addBooleanProperty
+function addGrowProp(cssProperties, prop) {
+  var { value } = prop
 
-  if (value === null) {
+  if (isBooleanProp(prop)) {
     addCssProperty(cssProperties, "flexGrow", t.numericLiteral(1))
-  } else if (t.isJSXExpressionContainer(value)) {
+  } else if (isStringProp(prop)) {
+    addCssProperty(cssProperties, "flexGrow", value)
+  } else if (isExpressionProp(prop)) {
     var { expression } = value
 
+    // e.g. grow={1}
     if (t.isNumericLiteral(expression)) {
       addCssProperty(cssProperties, "flexGrow", expression)
-    } else if (t.isStringLiteral(expression)) {
-      addCssProperty(cssProperties, "flexGrow", expression)
-    } else if (t.isIdentifier(expression)) {
+    }
+    // e.g. grow={"1"}
+    else if (t.isStringLiteral(expression)) {
       addCssProperty(cssProperties, "flexGrow", expression)
     }
-  } else if (t.isStringLiteral(value)) {
-    addCssProperty(cssProperties, "flexGrow", value)
+    // e.g. grow={someVar}
+    else if (t.isIdentifier(expression)) {
+      addCssProperty(cssProperties, "flexGrow", expression)
+    }
   }
+}
+
+// e.g. bold
+function isBooleanProp(prop) {
+  return prop.value === null
+}
+
+// e.g. bold={_}
+function isExpressionProp(prop) {
+  return t.isJSXExpressionContainer(prop.value)
+}
+
+// e.g. bold="_"
+function isStringProp(prop) {
+  return t.isStringLiteral(prop.value)
 }
 
 exports.buildDefaultCssProp = buildDefaultCssProp

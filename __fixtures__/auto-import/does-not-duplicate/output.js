@@ -1,4 +1,4 @@
-import { css } from "linaria";
+import { css } from "linaria"
 
 const something = () => (
   <div
@@ -9,4 +9,4 @@ const something = () => (
       flex-shrink: 0;
     `}
   />
-);
+)

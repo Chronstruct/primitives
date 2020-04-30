@@ -5,9 +5,9 @@ const tester = require("babel-plugin-tester").default
 tester({
   plugin: require("../src/index"),
   pluginName: "chronstruct-primitives",
-  babelOptions: {
-    babelrc: true,
-  },
+  // babelOptions: {
+  //   babelrc: true,
+  // },
   fixtures: path.join(__dirname, "..", "__fixtures__", "no-options"),
 })
 
