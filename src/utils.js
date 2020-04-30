@@ -6,6 +6,7 @@ var objectStylesToTemplate = require("./objectStylesToTemplate")
 
 /**
  * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
+ * @typedef { import("@babel/types").ObjectExpression } ObjectExpression
  */
 
 function buildDefaultCssProp(t, css) {
@@ -158,6 +159,46 @@ function renameTag(node, defaultTag = "div") {
 }
 
 /**
+ * @param {ObjectExpression} objectExpression
+ * @param {Object} cssObject
+ * @param {string} key
+ * @param {Object}
+ * @return {void}
+ */
+function addObjectValueToCSS(objectExpression, cssObject, key, valueMap) {
+  objectExpression.properties.forEach((property) => {
+    // Some values should be mapped to other values, like true => 1 for flex-grow/shrink
+    const value =
+      valueMap != null && property.value.value in valueMap
+        ? valueMap[property.value.value]
+        : property.value
+
+    // When key is a `var`, convert it to what Linaria will use: `${varName}`.
+    // I'd rather use the variable to let objectStylesToTemplate() handle [varName] as the key, but I don't know how.
+    const varSafeKey = t.isIdentifier(property.key)
+      ? `\${${property.key.name}}`
+      : property.key.value
+
+    // base case
+    if (varSafeKey === "") {
+      cssObject[key] = value
+    }
+    // ISN'T already in cssProperties
+    else if (!(varSafeKey in cssObject)) {
+      cssObject[varSafeKey] = t.objectExpression([
+        t.objectProperty(t.identifier(key), value),
+      ])
+    }
+    // IS already in cssProperties
+    else if (varSafeKey in cssObject) {
+      cssObject[varSafeKey].properties.push(
+        t.objectProperty(t.identifier(key), value)
+      )
+    }
+  })
+}
+
+/**
  * @param {Object} cssProperties
  * @param {string} key
  * @param {any} propValue
@@ -167,63 +208,17 @@ function addCssProperty(cssProperties, key, propValue, valueMap) {
   //   console.log("cssProperties", cssProperties)
   //   console.log("key", key)
   //   console.log("propValue", propValue)
-  //   console.log(
-  //     "propValue.expression.properties",
-  //     propValue.expression.properties
-  //   )
 
   if (t.isJSXExpressionContainer(propValue)) {
     var { expression } = propValue
 
     if (t.isObjectExpression(expression)) {
-      expression.properties.forEach((property) => {
-        //console.log(property)
-        //TODO: handle when key is of type 'Identifier'
-
-        // base case
-        if (property.key.value === "") {
-          cssProperties[key] = property.value
-        }
-        // state that ISN'T already in cssProperties
-        else if (!(property.key.value in cssProperties)) {
-          cssProperties[property.key.value] = t.objectExpression([
-            t.objectProperty(t.identifier(key), property.value),
-          ])
-        }
-        // state that IS already in cssProperties
-        else if (property.key.value in cssProperties) {
-          cssProperties[property.key.value].properties.push(
-            t.objectProperty(t.identifier(key), property.value)
-          )
-        }
-      })
+      addObjectValueToCSS(expression, cssProperties, key, valueMap)
     } else {
       cssProperties[key] = expression
     }
   } else if (t.isObjectExpression(propValue)) {
-    propValue.properties.forEach((property) => {
-      const value =
-        property.value.value in valueMap
-          ? valueMap[property.value.value]
-          : property.value
-
-      // base case
-      if (property.key.value === "") {
-        cssProperties[key] = value
-      }
-      // state that ISN'T already in cssProperties
-      else if (!(property.key.value in cssProperties)) {
-        cssProperties[property.key.value] = t.objectExpression([
-          t.objectProperty(t.identifier(key), value),
-        ])
-      }
-      // state that IS already in cssProperties
-      else if (property.key.value in cssProperties) {
-        cssProperties[property.key.value].properties.push(
-          t.objectProperty(t.identifier(key), value)
-        )
-      }
-    })
+    addObjectValueToCSS(propValue, cssProperties, key, valueMap)
   } else {
     cssProperties[key] = propValue
   }

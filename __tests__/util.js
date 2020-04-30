@@ -1,4 +1,3 @@
-const babel = require("@babel/core")
 var t = require("@babel/types")
 var Utils = require("../src/utils")
 
@@ -47,6 +46,36 @@ it("addCssProperty with ObjectExpression", () => {
   var expectedOutput = {
     [key]: t.numericLiteral(20),
     "@media screen and (min-width: 200px)": t.objectExpression([
+      t.objectProperty(t.identifier(key), t.numericLiteral(200)),
+    ]),
+  }
+
+  addCssProperty(input, key, value)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+//-- addObjectValueToCSS()
+it("addObjectValueToCSS handles var keys", () => {
+  // {'': 20, [someVar]: 200}
+  var input = {}
+  var key = "someKey"
+  var value = t.objectExpression([
+    t.objectProperty(t.stringLiteral(""), t.numericLiteral(20)),
+    t.objectProperty(t.identifier("someVar"), t.numericLiteral(200)),
+  ])
+
+  /*
+   {
+     '@media screen and (min-width: 200px)': {
+       size: 200
+     },
+     size: 20,
+    }
+   */
+  var expectedOutput = {
+    [key]: t.numericLiteral(20),
+    "${someVar}": t.objectExpression([
       t.objectProperty(t.identifier(key), t.numericLiteral(200)),
     ]),
   }
