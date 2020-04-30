@@ -239,8 +239,7 @@ function addCssProperties(cssProperties, propertiesToAdd) {
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
-// todo: rename to addBooleanPropertySet
-function addBooleanProperty(cssProperties, attribute, propertiesToAdd) {
+function addBooleanPropertySet(cssProperties, attribute, propertiesToAdd) {
   var { value } = attribute
   //   console.log("attribute", attribute)
 
@@ -272,49 +271,58 @@ function addBooleanProperty(cssProperties, attribute, propertiesToAdd) {
 
 /**
  * @param {Object} cssProperties
- * @param {JSXAttribute} prop
- * @param {Object} propertiesToAdd
- * @return {any} className prop with styles
+ * @param {JSXAttribute} jsxAttribute
+ * @param {string} key - key to apply to cssProperties
+ * @param {any} defaultValue - value to use when it is a booleanProp
+ * @return {void}
  */
-// todo: rename to addBooleanProperty
-function addGrowProp(cssProperties, prop) {
-  var { value } = prop
+function addBooleanProperty(cssProperties, jsxAttribute, key, defaultValue) {
+  var { value } = jsxAttribute
 
-  if (isBooleanProp(prop)) {
-    addCssProperty(cssProperties, "flexGrow", t.numericLiteral(1))
-  } else if (isStringProp(prop)) {
-    addCssProperty(cssProperties, "flexGrow", value)
-  } else if (isExpressionProp(prop)) {
+  if (isBooleanProp(jsxAttribute)) {
+    addCssProperty(cssProperties, key, defaultValue)
+  } else if (isStringProp(jsxAttribute)) {
+    addCssProperty(cssProperties, key, value)
+  } else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
     // e.g. grow={1}
     if (t.isNumericLiteral(expression)) {
-      addCssProperty(cssProperties, "flexGrow", expression)
+      addCssProperty(cssProperties, key, expression)
     }
     // e.g. grow={"1"}
     else if (t.isStringLiteral(expression)) {
-      addCssProperty(cssProperties, "flexGrow", expression)
+      addCssProperty(cssProperties, key, expression)
     }
     // e.g. grow={someVar}
     else if (t.isIdentifier(expression)) {
-      addCssProperty(cssProperties, "flexGrow", expression)
+      addCssProperty(cssProperties, key, expression)
+    }
+    // e.g. grow={true}
+    else if (t.isBooleanLiteral(expression)) {
+      addCssProperty(cssProperties, key, expression)
+    }
+    // e.g. grow={{'': true, 'hover': false}}
+    else if (t.isObjectExpression(expression)) {
+      //TODO finish this
+      // addCssProperty(cssProperties, key, expression)
     }
   }
 }
 
 // e.g. bold
-function isBooleanProp(prop) {
-  return prop.value === null
+function isBooleanProp(jsxAttribute) {
+  return jsxAttribute.value === null
 }
 
 // e.g. bold={_}
-function isExpressionProp(prop) {
-  return t.isJSXExpressionContainer(prop.value)
+function isExpressionProp(jsxAttribute) {
+  return t.isJSXExpressionContainer(jsxAttribute.value)
 }
 
 // e.g. bold="_"
-function isStringProp(prop) {
-  return t.isStringLiteral(prop.value)
+function isStringProp(jsxAttribute) {
+  return t.isStringLiteral(jsxAttribute.value)
 }
 
 exports.buildDefaultCssProp = buildDefaultCssProp
@@ -327,5 +335,5 @@ exports.addExpressionToTemplate = addExpressionToTemplate
 exports.renameTag = renameTag
 exports.addCssProperty = addCssProperty
 exports.addCssProperties = addCssProperties
+exports.addBooleanPropertySet = addBooleanPropertySet
 exports.addBooleanProperty = addBooleanProperty
-exports.addGrowProp = addGrowProp

@@ -4,9 +4,9 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-  addBooleanProperty = Utils.addBooleanProperty,
+  addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
-  addGrowProp = Utils.addGrowProp,
+  addBooleanProperty = Utils.addBooleanProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction
 // buildClassNameProp = Utils.buildClassNameProp,
 
@@ -201,9 +201,14 @@ module.exports = function (node, tagName) {
             cssProps
           )
         } else if (name in booleanProps) {
-          addBooleanProperty(cssProperties, attribute, booleanProps[name])
+          addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
         } else if (name === "grow") {
-          addGrowProp(cssProperties, attribute)
+          addBooleanProperty(
+            cssProperties,
+            attribute,
+            "flexGrow",
+            t.numericLiteral(1)
+          )
         } else {
           props.push(attribute)
         }

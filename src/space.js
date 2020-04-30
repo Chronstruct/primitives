@@ -4,7 +4,7 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-  addBooleanProperty = Utils.addBooleanProperty,
+  addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
@@ -65,7 +65,7 @@ module.exports = function (node) {
           // console.log("attribute", attribute)
           // console.log("attribute.value.expression", attribute.value.expression)
           // console.log("booleanProperties", booleanProps[name])
-          addBooleanProperty(cssProperties, attribute, booleanProps[name])
+          addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
         } else {
           props.push(attribute)
         }
