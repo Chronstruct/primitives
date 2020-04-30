@@ -4,6 +4,10 @@
 var t = require("@babel/types")
 var objectStylesToTemplate = require("./objectStylesToTemplate")
 
+/**
+ * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
+ */
+
 function buildDefaultCssProp(t, css) {
   return t.jSXAttribute(
     t.jSXIdentifier("css"),
@@ -238,7 +242,7 @@ function addCssProperties(cssProperties, propertiesToAdd) {
 
 /**
  * @param {Object} cssProperties
- * @param {JSXAttribute} jsxAttribute
+ * @param {Types.JSXAttribute} jsxAttribute
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
@@ -325,17 +329,29 @@ function addBooleanProperty(
   }
 }
 
-// e.g. bold
+/**
+ * e.g. bold
+ * @param {JSXAttribute} jsxAttribute
+ * @return {boolean}
+ */
 function isBooleanProp(jsxAttribute) {
   return jsxAttribute.value === null
 }
 
-// e.g. bold={_}
+/**
+ * e.g. bold={_}
+ * @param {JSXAttribute} jsxAttribute
+ * @return {boolean}
+ */
 function isExpressionProp(jsxAttribute) {
   return t.isJSXExpressionContainer(jsxAttribute.value)
 }
 
-// e.g. bold="_"
+/**
+ * e.g. bold="_"
+ * @param {JSXAttribute} jsxAttribute
+ * @return {boolean}
+ */
 function isStringProp(jsxAttribute) {
   return t.isStringLiteral(jsxAttribute.value)
 }

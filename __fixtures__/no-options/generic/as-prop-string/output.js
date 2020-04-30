@@ -1,6 +1,4 @@
-import { css } from "linaria";
-
-const something = () => <div className={css`
+<nav className={css`
   display: flex;
   align-content: flex-start;
   position: relative;

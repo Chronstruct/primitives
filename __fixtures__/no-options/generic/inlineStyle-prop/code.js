@@ -1,0 +1,1 @@
+<view inlineStyle={{backgroundColor: 'red', top: 0}} />

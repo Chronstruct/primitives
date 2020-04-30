@@ -1,5 +1,5 @@
 const path = require("path")
-const tester = require("babel-plugin-tester").default
+const tester = require("babel-plugin-tester/pure").default
 
 // No options
 tester({
@@ -8,6 +8,10 @@ tester({
   // babelOptions: {
   //   babelrc: true,
   // },
+
+  // use jest snapshots (only works with jest)
+  snapshot: true,
+
   fixtures: path.join(__dirname, "..", "__fixtures__", "no-options"),
 })
 

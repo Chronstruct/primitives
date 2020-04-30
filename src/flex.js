@@ -29,7 +29,7 @@ var propsToUse = {
   flex: "flex",
   wrap: "flexWrap",
   // grow: 'flex-grow',
-  shrink: "flexShrink",
+  // shrink: "flexShrink",
   basis: "flexBasis",
   order: "order",
   alignContent: "alignContent",
@@ -96,12 +96,12 @@ var booleanProps = {
   },
 }
 
-var defaultFlexCss =
-  "display: flex;flex-shrink: 0;align-content: flex-start;position: relative;"
-var defaultColCss =
-  "display: flex;flex-direction: column;flex-shrink: 0;align-content: flex-start;position: relative;"
-var defaultRowCss =
-  "display: flex;flex-direction: row;flex-shrink: 0;align-content: flex-start;position: relative;"
+// var defaultFlexCss =
+//   "display: flex;flex-shrink: 0;align-content: flex-start;position: relative;"
+// var defaultColCss =
+//   "display: flex;flex-direction: column;flex-shrink: 0;align-content: flex-start;position: relative;"
+// var defaultRowCss =
+//   "display: flex;flex-direction: row;flex-shrink: 0;align-content: flex-start;position: relative;"
 
 /*
 var defaultFlex = t.objectExpression(
@@ -138,7 +138,7 @@ var defaultFlex = {
   display: t.stringLiteral("flex"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  shrink: t.numericLiteral(0),
+  flexShrink: t.numericLiteral(0),
 }
 
 var defaultCol = {
@@ -146,7 +146,7 @@ var defaultCol = {
   flexDirection: t.stringLiteral("column"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  shrink: t.numericLiteral(0),
+  flexShrink: t.numericLiteral(0),
 }
 
 var defaultRow = {
@@ -154,7 +154,7 @@ var defaultRow = {
   flexDirection: t.stringLiteral("row"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  shrink: t.numericLiteral(0),
+  flexShrink: t.numericLiteral(0),
 }
 
 module.exports = function (node, tagName) {
@@ -203,10 +203,27 @@ module.exports = function (node, tagName) {
         } else if (name in booleanProps) {
           addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
         } else if (name === "grow") {
-          addBooleanProperty(cssProperties, attribute, "flexGrow", {
-            true: t.numericLiteral(1),
-            false: t.numericLiteral(0),
-          })
+          addBooleanProperty(
+            cssProperties,
+            attribute,
+            "flexGrow",
+            {
+              true: t.numericLiteral(1),
+              false: t.numericLiteral(0),
+            },
+            { allowNumber: true }
+          )
+        } else if (name === "shrink") {
+          addBooleanProperty(
+            cssProperties,
+            attribute,
+            "flexShrink",
+            {
+              true: t.numericLiteral(1),
+              false: t.numericLiteral(0),
+            },
+            { allowNumber: true }
+          )
         } else {
           props.push(attribute)
         }

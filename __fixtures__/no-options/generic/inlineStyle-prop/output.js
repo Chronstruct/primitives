@@ -1,6 +1,7 @@
-import { css } from "linaria";
-
-const something = () => <div className={css`
+<div style={{
+  backgroundColor: 'red',
+  top: 0
+}} className={css`
   display: flex;
   align-content: flex-start;
   position: relative;
