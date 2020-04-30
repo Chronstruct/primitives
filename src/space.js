@@ -4,7 +4,7 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-  addBooleanPropertySet = Utils.addBooleanPropertySet,
+  addBooleanProperty = Utils.addBooleanProperty,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction
 
@@ -19,13 +19,18 @@ var cssProps = {
 }
 
 var booleanProps = {
-  grow: {
-    flexGrow: t.numericLiteral(1),
-  },
-  shrink: {
-    flexShrink: t.numericLiteral(1),
-  },
+  grow: "flexGrow",
+  shrink: "flexShrink",
 }
+
+// var booleanProps = {
+//   grow: {
+//     flexGrow: t.numericLiteral(1),
+//   },
+//   shrink: {
+//     flexShrink: t.numericLiteral(1),
+//   },
+// }
 
 var defaultCss = {
   flexGrow: t.numericLiteral(0),
@@ -61,11 +66,10 @@ module.exports = function (node) {
             cssProps
           )
         } else if (name in booleanProps) {
-          // console.log(`cssProperties: ${cssProperties}`)
-          // console.log("attribute", attribute)
-          // console.log("attribute.value.expression", attribute.value.expression)
-          // console.log("booleanProperties", booleanProps[name])
-          addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
+          addBooleanProperty(cssProperties, attribute, booleanProps[name], {
+            true: t.numericLiteral(1),
+            false: t.numericLiteral(0),
+          })
         } else {
           props.push(attribute)
         }

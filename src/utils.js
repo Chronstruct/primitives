@@ -159,7 +159,7 @@ function renameTag(node, defaultTag = "div") {
  * @param {any} propValue
  * @return {any} className prop with styles
  */
-function addCssProperty(cssProperties, key, propValue) {
+function addCssProperty(cssProperties, key, propValue, valueMap) {
   //   console.log("cssProperties", cssProperties)
   //   console.log("key", key)
   //   console.log("propValue", propValue)
@@ -198,20 +198,23 @@ function addCssProperty(cssProperties, key, propValue) {
     }
   } else if (t.isObjectExpression(propValue)) {
     propValue.properties.forEach((property) => {
+      const value =
+        valueMap != null ? valueMap[property.value.value] : property.value.value
+
       // base case
       if (property.key.value === "") {
-        cssProperties[key] = property.value
+        cssProperties[key] = value
       }
       // state that ISN'T already in cssProperties
       else if (!(property.key.value in cssProperties)) {
         cssProperties[property.key.value] = t.objectExpression([
-          t.objectProperty(t.identifier(key), property.value),
+          t.objectProperty(t.identifier(key), value),
         ])
       }
       // state that IS already in cssProperties
       else if (property.key.value in cssProperties) {
         cssProperties[property.key.value].properties.push(
-          t.objectProperty(t.identifier(key), property.value)
+          t.objectProperty(t.identifier(key), value)
         )
       }
     })
@@ -226,9 +229,7 @@ function addCssProperty(cssProperties, key, propValue) {
  * @return {any} className prop with styles
  */
 function addCssProperties(cssProperties, propertiesToAdd) {
-  //   console.log(propertiesToAdd)
   Object.keys(propertiesToAdd).forEach((key) => {
-    // console.log(key)
     addCssProperty(cssProperties, key, propertiesToAdd[key])
   })
 }
@@ -273,39 +274,40 @@ function addBooleanPropertySet(cssProperties, attribute, propertiesToAdd) {
  * @param {Object} cssProperties
  * @param {JSXAttribute} jsxAttribute
  * @param {string} key - key to apply to cssProperties
- * @param {any} defaultValue - value to use when it is a booleanProp
+ * @param {{true: any, false: any}} valueMap - used to convert from boolean values
  * @return {void}
  */
-function addBooleanProperty(cssProperties, jsxAttribute, key, defaultValue) {
+function addBooleanProperty(cssProperties, jsxAttribute, key, valueMap) {
   var { value } = jsxAttribute
 
   if (isBooleanProp(jsxAttribute)) {
-    addCssProperty(cssProperties, key, defaultValue)
+    addCssProperty(cssProperties, key, valueMap[true])
   } else if (isStringProp(jsxAttribute)) {
     addCssProperty(cssProperties, key, value)
   } else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
-    // e.g. grow={1}
-    if (t.isNumericLiteral(expression)) {
-      addCssProperty(cssProperties, key, expression)
-    }
-    // e.g. grow={"1"}
-    else if (t.isStringLiteral(expression)) {
-      addCssProperty(cssProperties, key, expression)
-    }
+    // e.g. grow={1} NOT SUPPORTED
+    // if (t.isNumericLiteral(expression)) {
+    //   addCssProperty(cssProperties, key, expression)
+    // }
+
+    // e.g. grow={"1"}  NOT SUPPORTED
+    // else if (t.isStringLiteral(expression)) {
+    //   addCssProperty(cssProperties, key, expression)
+    // }
+
     // e.g. grow={someVar}
-    else if (t.isIdentifier(expression)) {
+    if (t.isIdentifier(expression)) {
       addCssProperty(cssProperties, key, expression)
     }
     // e.g. grow={true}
     else if (t.isBooleanLiteral(expression)) {
-      addCssProperty(cssProperties, key, expression)
+      addCssProperty(cssProperties, key, valueMap[expression.value])
     }
     // e.g. grow={{'': true, 'hover': false}}
     else if (t.isObjectExpression(expression)) {
-      //TODO finish this
-      // addCssProperty(cssProperties, key, expression)
+      addCssProperty(cssProperties, key, expression, valueMap)
     }
   }
 }

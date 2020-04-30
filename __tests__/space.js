@@ -68,7 +68,7 @@ it("size object", () => {
   const { code } = babel.transform(input, options)
 
   expect(code).toBe(
-    `<div ${start}${defaultCss}\n  flex-basis: 10px;\n  @media screen and (min-width: 200px) {\n    flex-basis: 200px;\n  }${end} />;`
+    `<div ${start}${defaultCss}\n  flex-basis: 10px;\n\n  @media screen and (min-width: 200px) {\n    flex-basis: 200px;\n  }${end} />;`
   )
 })
 
@@ -78,7 +78,7 @@ it("grow object", () => {
   const { code } = babel.transform(input, options)
 
   expect(code).toBe(
-    `<div ${start}\n  flex-shrink: 0;\n  flex-grow: 0;\n  @media screen and (min-width: 200px) {\n    flex-grow: 1;\n  }${end} />;`
+    `<div ${start}flex-grow: 0;\n  flex-shrink: 0;\n\n  @media screen and (min-width: 200px) {\n    flex-grow: 1;\n  }${end} />;`
   )
 })
 
@@ -90,12 +90,12 @@ it("shrink", () => {
   expect(code).toBe(`<div ${start}flex-grow: 0;\n  flex-shrink: 1;${end} />;`)
 })
 
-// it("shrink object", () => {
-//   var input = `<space shrink={{'': false, '@media screen and (min-width: 200px)': true}}/>`
+it("shrink object", () => {
+  var input = `<space shrink={{'': false, '@media screen and (min-width: 200px)': true}}/>`
 
-//   const { code } = babel.transform(input, options)
+  const { code } = babel.transform(input, options)
 
-//   expect(code).toBe(
-//     `<div ${start}\n  flex-grow: 0;\n  flex-shrink: 0;\n  @media screen and (min-width: 200px) {\n    flex-shrink: 1;\n  }${end} />;`
-//   )
-// })
+  expect(code).toBe(
+    `<div ${start}flex-grow: 0;\n  flex-shrink: 0;\n\n  @media screen and (min-width: 200px) {\n    flex-shrink: 1;\n  }${end} />;`
+  )
+})

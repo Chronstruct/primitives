@@ -95,12 +95,10 @@ module.exports = function (node) {
         } else if (name in booleanProps) {
           addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
         } else if (name === "grow") {
-          addBooleanProperty(
-            cssProperties,
-            attribute,
-            "flexGrow",
-            t.numericLiteral(1)
-          )
+          addBooleanProperty(cssProperties, attribute, "flexGrow", {
+            true: t.numericLiteral(1),
+            false: t.numericLiteral(0),
+          })
         } else {
           props.push(attribute)
         }
