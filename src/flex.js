@@ -212,6 +212,7 @@ module.exports = function (node, tagName) {
         else if (name === "grow") {
           addBooleanProperty(
             cssProperties,
+            inlineStyleObject,
             attribute,
             "flexGrow",
             {
@@ -224,6 +225,7 @@ module.exports = function (node, tagName) {
         else if (name === "shrink") {
           addBooleanProperty(
             cssProperties,
+            inlineStyleObject,
             attribute,
             "flexShrink",
             {

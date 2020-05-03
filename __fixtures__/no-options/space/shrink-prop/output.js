@@ -36,8 +36,10 @@
   }
   <div className={css`
   flex-grow: 0;
-  flex-shrink: ${`${someVar ? true : false}`};
-`} />
+  flex-shrink: 0;
+`} style={{
+    flexShrink: `${someVar ? true : false}`
+  }} />
 
   {
     /* object */

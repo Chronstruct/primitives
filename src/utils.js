@@ -4,6 +4,9 @@
 var t = require("@babel/types")
 var objectStylesToTemplate = require("./objectStylesToTemplate")
 
+// from https://stackoverflow.com/questions/43224835
+const allCapsRegex = /^[A-Z]+(?:_[A-Z]+)*$/
+
 /**
  * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
  * @typedef { import("@babel/types").ObjectExpression } ObjectExpression
@@ -323,6 +326,7 @@ function addBooleanPropertySet(cssProperties, jsxAttribute, propertiesToAdd) {
 // }
 /**
  * @param {Object} cssProperties
+ * @param {Object} dynamicStyle
  * @param {JSXAttribute} jsxAttribute
  * @param {string} key - key to apply to cssProperties
  * @param {{true: any, false: any}} valueMap - used to convert from boolean values
@@ -331,6 +335,7 @@ function addBooleanPropertySet(cssProperties, jsxAttribute, propertiesToAdd) {
  */
 function addBooleanProperty(
   cssProperties,
+  dynamicStyle,
   jsxAttribute,
   key,
   valueMap,
@@ -348,7 +353,7 @@ function addBooleanProperty(
   else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
-    console.log("expression:", expression)
+    // console.log(expression)
 
     // e.g. grow={1} (NOT SUPPORTED by default)
     if (config && config.allowNumber && t.isNumericLiteral(expression)) {
@@ -360,8 +365,14 @@ function addBooleanProperty(
     }
     // e.g. grow={someVar}
     else if (t.isIdentifier(expression)) {
-      // TODO: check ALL_CAPS. send to inline if not.
-      addCssProperty(cssProperties, key, expression)
+      // By convention, CONSTANT_VARS will be evaluated for static extraction
+      if (allCapsRegex.test(expression.name)) {
+        addCssProperty(cssProperties, key, expression)
+      }
+      // All other vars will be added to dynamic styles
+      else {
+        dynamicStyle[key] = expression
+      }
     }
     // e.g. grow={true}
     else if (t.isBooleanLiteral(expression)) {
@@ -372,12 +383,17 @@ function addBooleanProperty(
       addCssProperty(cssProperties, key, expression, valueMap)
     }
     // e.g. grow={isTrue ? true : false}
-    // e.g. grow={isTrue && true}
     else if (t.isConditionalExpression(expression)) {
-      //todo: pass to inline styles
+      dynamicStyle[key] = expression
     }
-    // todo: shrink={`${someVar}`}
-    // todo: strink=
+    // e.g. grow={isTrue && true}
+    else if (t.isLogicalExpression(expression)) {
+      dynamicStyle[key] = expression
+    }
+    // e.g. grow={`${someVar}`}
+    else if (t.isTemplateLiteral(expression)) {
+      dynamicStyle[key] = expression
+    }
   }
 }
 

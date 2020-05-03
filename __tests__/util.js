@@ -1,6 +1,5 @@
 var t = require("@babel/types")
 var Utils = require("../src/utils")
-
 var renameTag = Utils.renameTag,
   addBooleanPropertySet = Utils.addBooleanPropertySet,
   addBooleanProperty = Utils.addBooleanProperty,
@@ -180,7 +179,7 @@ it("addBooleanProperty `grow`", () => {
 
   var expectedOutput = { [key]: valueMap[true] }
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -194,7 +193,7 @@ it(`addBooleanProperty grow="string" does nothing by default`, () => {
 
   var expectedOutput = {}
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -208,7 +207,7 @@ it(`addBooleanProperty grow="string" does something when enabled`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap, { allowString: true })
+  addBooleanProperty(input, {}, attribute, key, valueMap, { allowString: true })
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -225,7 +224,7 @@ it(`addBooleanProperty grow={"string"} does nothing by default`, () => {
 
   var expectedOutput = {}
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -242,7 +241,7 @@ it(`addBooleanProperty grow={"string"} does something when enabled`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap, { allowString: true })
+  addBooleanProperty(input, {}, attribute, key, valueMap, { allowString: true })
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -259,7 +258,7 @@ it(`addBooleanProperty grow={1} does nothing by default`, () => {
 
   var expectedOutput = {}
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -276,7 +275,7 @@ it(`addBooleanProperty grow={1} does something when enabled`, () => {
 
   var expectedOutput = { [key]: value }
 
-  addBooleanProperty(input, attribute, key, valueMap, { allowNumber: true })
+  addBooleanProperty(input, {}, attribute, key, valueMap, { allowNumber: true })
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -292,7 +291,7 @@ it(`addBooleanProperty grow={true}`, () => {
 
   var expectedOutput = { [key]: valueMap[true] }
 
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -317,7 +316,7 @@ it(`addBooleanProperty grow={{'': true, 'hover': false}}`, () => {
       t.objectProperty(t.identifier(key), t.numericLiteral(0)),
     ]),
   }
-  addBooleanProperty(input, attribute, key, valueMap)
+  addBooleanProperty(input, {}, attribute, key, valueMap)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -342,7 +341,7 @@ it(`addBooleanProperty grow={{'': 1, 'hover': false}}`, () => {
       t.objectProperty(t.identifier(key), t.numericLiteral(0)),
     ]),
   }
-  addBooleanProperty(input, attribute, key, valueMap, { allowNumber: true })
+  addBooleanProperty(input, {}, attribute, key, valueMap, { allowNumber: true })
 
   expect(input).toStrictEqual(expectedOutput)
 })

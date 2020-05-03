@@ -35,9 +35,11 @@
     /* expression conditionalExpression */
   }
   <div className={css`
-  flex-grow: ${`${someVar ? true : false}`};
+  flex-grow: 0;
   flex-shrink: 0;
-`} />
+`} style={{
+    flexGrow: `${someVar ? true : false}`
+  }} />
 
   {
     /* object */

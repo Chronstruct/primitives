@@ -67,6 +67,7 @@ module.exports = function (node) {
         else if (name in booleanProps) {
           addBooleanProperty(
             cssProperties,
+            inlineStyleObject,
             attribute,
             booleanProps[name],
             {
