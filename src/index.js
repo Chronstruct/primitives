@@ -9,7 +9,7 @@ module.exports = function (babel) {
   var { types: t } = babel
 
   return {
-    // inherits @babel/plugin-syntax-jsx
+    // below equates to `inherits: @babel/plugin-syntax-jsx;`
     // https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-jsx/src/index.js#L9
     manipulateOptions(opts, parserOpts) {
       // If the Typescript plugin already ran, it will have decided whether

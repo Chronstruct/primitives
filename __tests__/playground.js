@@ -8,7 +8,11 @@ it("A test suite must contain at least one test", () => {
 })
 
 it("playground", () => {
-  var input = `<space shrink={{_: true, someVar: 2, [otherVar]: 3}} />`
+  // var input = `<space shrink={\`\${someVar ? true : false}\`}/>`
+  // var input = `<space shrink={\`\${someVar && true}\`}/>`
+  // var input = `<space shrink={\`\${someVar}\`}/>`
+  var input = `<text inlineStyle={{something: 'other'}}/>`
+
   // var input = `<space shrink={{someVar: 2, [otherVar]: 3}} />`
 
   const { code } = babel.transform(input, options)

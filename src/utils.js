@@ -96,6 +96,19 @@ function buildClassNameProp(t, css) {
   )
 }
 
+function buildStyleProp(t, styleObject, styleBabelProperties) {
+  var objectProperties = Object.keys(styleObject).map((key) => {
+    return t.objectProperty(t.identifier(key), styleObject[key])
+  })
+
+  return t.jSXAttribute(
+    t.jSXIdentifier("style"),
+    t.jSXExpressionContainer(
+      t.objectExpression([...objectProperties, ...styleBabelProperties])
+    )
+  )
+}
+
 function addTemplateToTemplate(target, template) {
   if (template.expressions.length > 0) {
     if (target.expressions.length === target.quasis.length) {
@@ -335,6 +348,8 @@ function addBooleanProperty(
   else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
+    console.log("expression:", expression)
+
     // e.g. grow={1} (NOT SUPPORTED by default)
     if (config && config.allowNumber && t.isNumericLiteral(expression)) {
       addCssProperty(cssProperties, key, expression)
@@ -345,6 +360,7 @@ function addBooleanProperty(
     }
     // e.g. grow={someVar}
     else if (t.isIdentifier(expression)) {
+      // TODO: check ALL_CAPS. send to inline if not.
       addCssProperty(cssProperties, key, expression)
     }
     // e.g. grow={true}
@@ -355,6 +371,13 @@ function addBooleanProperty(
     else if (t.isObjectExpression(expression)) {
       addCssProperty(cssProperties, key, expression, valueMap)
     }
+    // e.g. grow={isTrue ? true : false}
+    // e.g. grow={isTrue && true}
+    else if (t.isConditionalExpression(expression)) {
+      //todo: pass to inline styles
+    }
+    // todo: shrink={`${someVar}`}
+    // todo: strink=
   }
 }
 
@@ -388,6 +411,7 @@ function isStringProp(jsxAttribute) {
 exports.buildDefaultCssProp = buildDefaultCssProp
 exports.buildClassNamePropFunction = buildClassNamePropFunction
 exports.buildClassNameProp = buildClassNameProp
+exports.buildStyleProp = buildStyleProp
 exports.addTemplateToTemplate = addTemplateToTemplate
 exports.addStringToTemplate = addStringToTemplate
 exports.addQuasiToTemplate = addQuasiToTemplate

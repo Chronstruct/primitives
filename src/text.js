@@ -7,13 +7,14 @@ var renameTag = Utils.renameTag,
   addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
   addBooleanProperty = Utils.addBooleanProperty,
-  buildClassNamePropFunction = Utils.buildClassNamePropFunction
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction,
+  buildStyleProp = Utils.buildStyleProp
 
 var propsToOmit = {
   as: true,
 }
 
-var cssProps = {
+var cssPropertyMap = {
   align: "textAlign",
   color: "color",
   decoration: "textDecoration",
@@ -68,7 +69,8 @@ var defaultCss = {
 module.exports = function (node) {
   function buildProps(node, defaultCss) {
     var cssProperties = Object.assign({}, defaultCss)
-
+    var inlineStyleObject = {}
+    var inlineStyleBabelProperties = []
     var props = []
 
     // var css = buildDefaultCssProp(t, defaultCss)
@@ -83,36 +85,56 @@ module.exports = function (node) {
 
         if (name in propsToOmit) {
           return
-        } else if (name === "style") {
+        }
+        else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(cssProperties, property.key.name, property.value)
           })
-        } else if (name === "inlineStyle") {
-          attribute.name.name = "style"
-          props.push(attribute)
-        } else if (name in cssProps) {
-          addCssProperty(cssProperties, cssProps[name], attribute.value)
-        } else if (name in booleanProps) {
+        }
+        else if (name === "inlineStyle") {
+          inlineStyleBabelProperties.push(
+            ...attribute.value.expression.properties
+          )
+        }
+        else if (name in cssPropertyMap) {
+          addCssProperty(cssProperties, cssPropertyMap[name], attribute.value)
+        }
+        else if (name in booleanProps) {
           addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
-        } else if (name === "grow") {
+        }
+        else if (name === "grow") {
           addBooleanProperty(cssProperties, attribute, "flexGrow", {
             true: t.numericLiteral(1),
             false: t.numericLiteral(0),
           })
-        } else {
+        }
+        else {
           props.push(attribute)
         }
       })
     }
 
-    var className = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var classNameProp = buildClassNamePropFunction(
+      t,
+      cssProperties,
+      cssPropertyMap
+    )
+    classNameProp.value.expression.loc = node.loc
+    props.push(classNameProp)
 
-    //console.log(className)
-    className.value.expression.loc = node.loc
-
-    //var cssProperties = className.value.expression.arguments[0].properties
-
-    props.push(className)
+    // Add inline styles prop if there are styles to add
+    if (
+      Object.keys(inlineStyleObject).length > 0 ||
+      inlineStyleBabelProperties.length > 0
+    ) {
+      var styleProp = buildStyleProp(
+        t,
+        inlineStyleObject,
+        inlineStyleBabelProperties
+      )
+      styleProp.value.expression.loc = node.loc
+      props.push(styleProp)
+    }
 
     return props
   }

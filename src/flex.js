@@ -7,8 +7,8 @@ var renameTag = Utils.renameTag,
   addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
   addBooleanProperty = Utils.addBooleanProperty,
-  buildClassNamePropFunction = Utils.buildClassNamePropFunction
-// buildClassNameProp = Utils.buildClassNameProp,
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction,
+  buildStyleProp = Utils.buildStyleProp
 
 var propsToOmit = {
   as: true,
@@ -161,7 +161,8 @@ module.exports = function (node, tagName) {
   function buildProps(node, defaultCss, cssProps) {
     // var css = buildDefaultCssProp(t, defaultCss)
     var cssProperties = Object.assign({}, defaultCss)
-
+    var inlineStyleObject = {}
+    var inlineStyleBabelProperties = []
     var props = []
 
     //var className = buildClassNamePropFunction(t, cssProperties)
@@ -181,7 +182,8 @@ module.exports = function (node, tagName) {
 
         if (name in propsToOmit) {
           return
-        } else if (name === "style") {
+        }
+        else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               cssProperties,
@@ -190,19 +192,24 @@ module.exports = function (node, tagName) {
               cssProps
             )
           })
-        } else if (name === "inlineStyle") {
-          attribute.name.name = "style"
-          props.push(attribute)
-        } else if (name in cssProps) {
+        }
+        else if (name === "inlineStyle") {
+          inlineStyleBabelProperties.push(
+            ...attribute.value.expression.properties
+          )
+        }
+        else if (name in cssProps) {
           addCssProperty(
             cssProperties,
             cssProps[name],
             attribute.value,
             cssProps
           )
-        } else if (name in booleanProps) {
+        }
+        else if (name in booleanProps) {
           addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
-        } else if (name === "grow") {
+        }
+        else if (name === "grow") {
           addBooleanProperty(
             cssProperties,
             attribute,
@@ -213,7 +220,8 @@ module.exports = function (node, tagName) {
             },
             { allowNumber: true }
           )
-        } else if (name === "shrink") {
+        }
+        else if (name === "shrink") {
           addBooleanProperty(
             cssProperties,
             attribute,
@@ -224,22 +232,30 @@ module.exports = function (node, tagName) {
             },
             { allowNumber: true }
           )
-        } else {
+        }
+        else {
           props.push(attribute)
         }
       })
     }
 
-    //console.log(cssProperties)
+    var classNameProp = buildClassNamePropFunction(t, cssProperties, cssProps)
+    classNameProp.value.expression.loc = node.loc
+    props.push(classNameProp)
 
-    var className = buildClassNamePropFunction(t, cssProperties, cssProps)
-
-    //console.log(className)
-    className.value.expression.loc = node.loc
-
-    //var cssProperties = className.value.expression.arguments[0].properties
-
-    props.push(className)
+    // Add inline styles prop if there are styles to add
+    if (
+      Object.keys(inlineStyleObject).length > 0 ||
+      inlineStyleBabelProperties.length > 0
+    ) {
+      var styleProp = buildStyleProp(
+        t,
+        inlineStyleObject,
+        inlineStyleBabelProperties
+      )
+      styleProp.value.expression.loc = node.loc
+      props.push(styleProp)
+    }
 
     return props
   }
@@ -251,13 +267,16 @@ module.exports = function (node, tagName) {
       defaultFlex,
       flexPropsToUse
     )
-  } else if (tagName === "col" || tagName === "v") {
+  }
+  else if (tagName === "col" || tagName === "v") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
-  } else if (tagName === "row" || tagName === "h") {
+  }
+  else if (tagName === "row" || tagName === "h") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultRow, propsToUse)
-  } else if (tagName === "flex" || tagName === "stack") {
+  }
+  else if (tagName === "flex" || tagName === "stack") {
     renameTag(node)
     node.openingElement.attributes = buildProps(
       node,

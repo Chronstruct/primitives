@@ -6,7 +6,8 @@ var Utils = require("./utils")
 var renameTag = Utils.renameTag,
   addBooleanProperty = Utils.addBooleanProperty,
   addCssProperty = Utils.addCssProperty,
-  buildClassNamePropFunction = Utils.buildClassNamePropFunction
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction,
+  buildStyleProp = Utils.buildStyleProp
 
 var propsToOmit = {
   as: true,
@@ -29,7 +30,8 @@ var defaultCss = {
 module.exports = function (node) {
   function buildProps(node) {
     var cssProperties = Object.assign({}, defaultCss)
-
+    var inlineStyleObject = {}
+    var inlineStyleBabelProperties = []
     var props = []
 
     if (node.openingElement.attributes != null) {
@@ -38,7 +40,8 @@ module.exports = function (node) {
 
         if (name in propsToOmit) {
           return
-        } else if (name === "style") {
+        }
+        else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               cssProperties,
@@ -47,14 +50,21 @@ module.exports = function (node) {
               cssProps
             )
           })
-        } else if (name in cssProps) {
+        }
+        else if (name === "inlineStyle") {
+          inlineStyleBabelProperties.push(
+            ...attribute.value.expression.properties
+          )
+        }
+        else if (name in cssProps) {
           addCssProperty(
             cssProperties,
             cssProps[name],
             attribute.value,
             cssProps
           )
-        } else if (name in booleanProps) {
+        }
+        else if (name in booleanProps) {
           addBooleanProperty(
             cssProperties,
             attribute,
@@ -65,20 +75,30 @@ module.exports = function (node) {
             },
             { allowNumber: true }
           )
-        } else {
+        }
+        else {
           props.push(attribute)
         }
       })
     }
 
-    var className = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var classNameProp = buildClassNamePropFunction(t, cssProperties, cssProps)
+    classNameProp.value.expression.loc = node.loc
+    props.push(classNameProp)
 
-    //console.log(className)
-    className.value.expression.loc = node.loc
-
-    //var cssProperties = className.value.expression.arguments[0].properties
-
-    props.push(className)
+    // Add inline styles prop if there are styles to add
+    if (
+      Object.keys(inlineStyleObject).length > 0 ||
+      inlineStyleBabelProperties.length > 0
+    ) {
+      var styleProp = buildStyleProp(
+        t,
+        inlineStyleObject,
+        inlineStyleBabelProperties
+      )
+      styleProp.value.expression.loc = node.loc
+      props.push(styleProp)
+    }
 
     return props
   }
