@@ -5,6 +5,7 @@ function loadStories() {
   require("../__stories__/space.js")
   require("../__stories__/text.js")
   require("../__stories__/button.js")
+  require("../__stories__/composite-components.js")
   // You can require as many stories as you need.
 }
 

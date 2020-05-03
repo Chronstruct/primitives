@@ -54,7 +54,8 @@ function buildClassNamePropFunction(t, cssObject, keyAliases) {
 
     if (!isNaN(key)) {
       key = `@media screen and (min-width: ${key}px)`
-    } else if (key in keyAliases) {
+    }
+    else if (key in keyAliases) {
       key = keyAliases[key]
     }
 
@@ -103,7 +104,8 @@ function addTemplateToTemplate(target, template) {
         template.expressions.slice(0)
       )
       target.quasis = target.quasis.concat(template.quasis.slice(0))
-    } else {
+    }
+    else {
       target.expressions = target.expressions.concat(
         template.expressions.slice(0)
       )
@@ -112,7 +114,8 @@ function addTemplateToTemplate(target, template) {
       addStringToTemplate(target, template.quasis[0].value.raw)
       target.quasis = target.quasis.concat(template.quasis.slice(1))
     }
-  } else {
+  }
+  else {
     addStringToTemplate(target, template.quasis[0].value.raw)
   }
 }
@@ -145,7 +148,8 @@ function renameTag(node, defaultTag = "div") {
 
       if (val != null) {
         tagName = val
-      } else {
+      }
+      else {
         console.log("invalid `as` value. No variables allowed.")
       }
     }
@@ -161,11 +165,11 @@ function renameTag(node, defaultTag = "div") {
 /**
  * @param {ObjectExpression} objectExpression
  * @param {Object} cssObject
- * @param {string} key
+ * @param {string} cssKey
  * @param {Object}
  * @return {void}
  */
-function addObjectValueToCSS(objectExpression, cssObject, key, valueMap) {
+function addObjectValueToCSS(objectExpression, cssObject, cssKey, valueMap) {
   objectExpression.properties.forEach((property) => {
     // Some values should be mapped to other values, like true => 1 for flex-grow/shrink
     const value =
@@ -173,27 +177,52 @@ function addObjectValueToCSS(objectExpression, cssObject, key, valueMap) {
         ? valueMap[property.value.value]
         : property.value
 
-    // When key is a `var`, convert it to what Linaria will use: `${varName}`.
-    // I'd rather use the variable to let objectStylesToTemplate() handle [varName] as the key, but I don't know how.
-    const varSafeKey = t.isIdentifier(property.key)
-      ? `\${${property.key.name}}`
+    const key = t.isIdentifier(property.key)
+      ? property.key.name
       : property.key.value
 
-    // base case
-    if (varSafeKey === "") {
-      cssObject[key] = value
+    // key is a variable. e.g. {[someVarKey]: value}
+    if (property.computed) {
+      // When key is a `var`, convert it to what Linaria will use: `${varName}`.
+      // I'd rather use the variable to let objectStylesToTemplate() handle [varName] as the key, but I don't know how.
+      const varSafeKey = `\${${property.key.name}}`
+
+      // IS already in cssProperties
+      if (varSafeKey in cssObject) {
+        // e.g. [HOVER]: { already: added; color: red; }
+        cssObject[varSafeKey].properties.push(
+          t.objectProperty(t.identifier(cssKey), value)
+        )
+      }
+      // ISN'T already in cssProperties
+      else {
+        // e.g. [HOVER]: { color: red; }
+        cssObject[varSafeKey] = t.objectExpression([
+          t.objectProperty(t.identifier(cssKey), value),
+        ])
+      }
     }
-    // ISN'T already in cssProperties
-    else if (!(varSafeKey in cssObject)) {
-      cssObject[varSafeKey] = t.objectExpression([
-        t.objectProperty(t.identifier(key), value),
-      ])
-    }
-    // IS already in cssProperties
-    else if (varSafeKey in cssObject) {
-      cssObject[varSafeKey].properties.push(
-        t.objectProperty(t.identifier(key), value)
-      )
+    // key is a literal (or identifier that should be interpretted as a literal)
+    else {
+      // default case
+      if (key === "" || key === "_") {
+        // e.g. color: red;
+        cssObject[cssKey] = value
+      }
+      // IS already in cssProperties
+      else if (key in cssObject) {
+        // e.g. hover: { already: added; color: red; }
+        cssObject[key].properties.push(
+          t.objectProperty(t.identifier(cssKey), value)
+        )
+      }
+      // ISN'T already in cssProperties
+      else {
+        // e.g. hover: { color: red; }
+        cssObject[key] = t.objectExpression([
+          t.objectProperty(t.identifier(cssKey), value),
+        ])
+      }
     }
   })
 }
@@ -214,12 +243,15 @@ function addCssProperty(cssProperties, key, propValue, valueMap) {
 
     if (t.isObjectExpression(expression)) {
       addObjectValueToCSS(expression, cssProperties, key, valueMap)
-    } else {
+    }
+    else {
       cssProperties[key] = expression
     }
-  } else if (t.isObjectExpression(propValue)) {
+  }
+  else if (t.isObjectExpression(propValue)) {
     addObjectValueToCSS(propValue, cssProperties, key, valueMap)
-  } else {
+  }
+  else {
     cssProperties[key] = propValue
   }
 }
@@ -247,7 +279,8 @@ function addBooleanPropertySet(cssProperties, jsxAttribute, propertiesToAdd) {
 
   if (isBooleanProp(jsxAttribute)) {
     addCssProperties(cssProperties, propertiesToAdd)
-  } else if (t.isJSXExpressionContainer(value)) {
+  }
+  else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
 
     if (t.isBooleanLiteral(expression) && expression.value === true) {
@@ -298,7 +331,8 @@ function addBooleanProperty(
   // e.g. grow="1" (NOT SUPPORTED by default)
   else if (config && config.allowString && isStringProp(jsxAttribute)) {
     addCssProperty(cssProperties, key, value)
-  } else if (isExpressionProp(jsxAttribute)) {
+  }
+  else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
     // e.g. grow={1} (NOT SUPPORTED by default)

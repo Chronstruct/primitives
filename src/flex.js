@@ -244,27 +244,20 @@ module.exports = function (node, tagName) {
     return props
   }
 
-  if (tagName === "view") {
+  if (tagName === "view" || tagName === "box" || tagName === "BOX") {
     renameTag(node)
     node.openingElement.attributes = buildProps(
       node,
       defaultFlex,
       flexPropsToUse
     )
-  } else if (tagName === "col") {
+  } else if (tagName === "col" || tagName === "v") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
-  } else if (tagName === "row") {
+  } else if (tagName === "row" || tagName === "h") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultRow, propsToUse)
-  } else if (tagName === "flex") {
-    renameTag(node)
-    node.openingElement.attributes = buildProps(
-      node,
-      defaultFlex,
-      flexPropsToUse
-    )
-  } else if (tagName === "box") {
+  } else if (tagName === "flex" || tagName === "stack") {
     renameTag(node)
     node.openingElement.attributes = buildProps(
       node,

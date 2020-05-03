@@ -74,12 +74,14 @@ module.exports = function (styleObject) {
         if (prop.computed) {
           text += `\n${indent}`
           finalize(prop.key, " {")
-        } else {
+        }
+        else {
           let key
 
           if (t.isIdentifier(prop.key)) {
             key = prop.key.name
-          } else {
+          }
+          else {
             key = prop.key.value
           }
 
@@ -96,10 +98,12 @@ module.exports = function (styleObject) {
       if (prop.computed) {
         text += `\n${indent}`
         finalize(prop.key, ": ")
-      } else {
+      }
+      else {
         if (t.isIdentifier(prop.key)) {
           key = prop.key.name
-        } else {
+        }
+        else {
           key = prop.key.value
         }
 
@@ -114,7 +118,8 @@ module.exports = function (styleObject) {
         }
 
         text += `${value};`
-      } else {
+      }
+      else {
         finalize(prop.value, ";")
       }
     })

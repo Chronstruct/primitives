@@ -56,21 +56,51 @@ it("addCssProperty with ObjectExpression", () => {
 })
 
 //-- addObjectValueToCSS()
+
 it("addObjectValueToCSS handles var keys", () => {
+  // {'': 20, someVar: 200}
+  var input = {}
+  var key = "someKey"
+  var value = t.objectExpression([
+    t.objectProperty(t.stringLiteral(""), t.numericLiteral(20)),
+    t.objectProperty(t.identifier("_dynamic"), t.numericLiteral(200)),
+  ])
+
+  /*
+   {
+     size: 20,
+     '@media screen and (min-width: 200px)': {
+       size: 200
+     },
+    }
+   */
+  var expectedOutput = {
+    [key]: t.numericLiteral(20),
+    _dynamic: t.objectExpression([
+      t.objectProperty(t.identifier(key), t.numericLiteral(200)),
+    ]),
+  }
+
+  addCssProperty(input, key, value)
+
+  expect(input).toStrictEqual(expectedOutput)
+})
+
+it("addObjectValueToCSS handles computed var keys", () => {
   // {'': 20, [someVar]: 200}
   var input = {}
   var key = "someKey"
   var value = t.objectExpression([
     t.objectProperty(t.stringLiteral(""), t.numericLiteral(20)),
-    t.objectProperty(t.identifier("someVar"), t.numericLiteral(200)),
+    t.objectProperty(t.identifier("someVar"), t.numericLiteral(200), true),
   ])
 
   /*
    {
+     size: 20,
      '@media screen and (min-width: 200px)': {
        size: 200
      },
-     size: 20,
     }
    */
   var expectedOutput = {

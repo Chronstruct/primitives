@@ -61,12 +61,19 @@ module.exports = function (babel) {
           case "row":
           case "flex":
           case "box":
+          case "BOX":
+          case "v":
+          case "h":
+          case "stack":
             convertFlex(path.node, element.name)
             break
           case "space":
+          case "SPACE":
             convertSpace(path.node)
             break
           case "text":
+          case "txt":
+          case "TEXT":
             convertText(path.node)
             break
         }
