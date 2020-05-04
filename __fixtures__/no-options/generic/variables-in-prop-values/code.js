@@ -15,5 +15,5 @@
 <view height={`${ALL_CAPS}px`}/>
 
 {/* size expression ALL_CAPS conditionalExpression */}
-<view grow={`${ALL_CAPS ? true : false}`}/>
+<view grow={ALL_CAPS ? true : false}/>
 </>

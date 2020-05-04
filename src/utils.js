@@ -307,15 +307,65 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
   }
   // e.g. grow={isTrue ? true : false}
   else if (t.isConditionalExpression(propValue)) {
-    dynamicStyle[key] = propValue
+    const { test, consequent, alternate } = propValue
+
+    if (t.isIdentifier(test) && allCapsRegex.test(test.name)) {
+      const identifiers = []
+
+      if (t.isIdentifier(consequent)) {
+        identifiers.push(consequent)
+      }
+
+      if (t.isIdentifier(alternate)) {
+        identifiers.push(alternate)
+      }
+
+      if (
+        identifiers.every((expression) => allCapsRegex.test(expression.name))
+      ) {
+        cssProperties[key] = propValue
+      }
+      else {
+        dynamicStyle[key] = propValue
+      }
+    }
+    else {
+      dynamicStyle[key] = propValue
+    }
   }
   // e.g. grow={isTrue && true}
   else if (t.isLogicalExpression(propValue)) {
-    dynamicStyle[key] = propValue
+    const { left, right } = propValue
+    const identifiers = []
+
+    if (t.isIdentifier(left)) {
+      identifiers.push(left)
+    }
+
+    if (t.isIdentifier(right)) {
+      identifiers.push(right)
+    }
+
+    if (identifiers.every((expression) => allCapsRegex.test(expression.name))) {
+      cssProperties[key] = propValue
+    }
+    else {
+      dynamicStyle[key] = propValue
+    }
   }
   // e.g. grow={`${someVar}`}
   else if (t.isTemplateLiteral(propValue)) {
-    dynamicStyle[key] = propValue
+    // e.g. height={`${HEIGHT_CONST}px`}
+    if (
+      propValue.expressions.every((expression) =>
+        allCapsRegex.test(expression.name)
+      )
+    ) {
+      cssProperties[key] = propValue
+    }
+    else {
+      dynamicStyle[key] = propValue
+    }
   }
   else {
     cssProperties[key] = propValue

@@ -54,7 +54,7 @@
   align-content: flex-start;
   position: relative;
   flex-shrink: 0;
-  height: ${ALL_CAPS}px;
+  height: ${`${ALL_CAPS}px`};
 `} />
 
   {

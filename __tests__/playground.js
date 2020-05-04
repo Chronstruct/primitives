@@ -13,7 +13,10 @@ it("A test suite must contain at least one test", () => {
 //   // var input = `<text className={css\`background: red;\`}/>`
 //   // var input = `<text className={someVar}/>`
 //   // var input = `<text className={"someString"}/>`
-//   var input = `<text className="someString"/>`
+//   // var input = `<box grow={SOME_CONST && true}/>`
+//   // var input = `<box grow={SOME_CONST && someVar}/>`
+
+//   var input = `<box grow={SOME_VAR ? someVar : 1}/>`
 
 //   const { code } = babel.transform(input, options)
 
