@@ -9,7 +9,10 @@ var renameTag = Utils.renameTag,
   addCssProperty = Utils.addCssProperty,
   addBooleanProperty = Utils.addBooleanProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction,
-  buildStyleProp = Utils.buildStyleProp
+  buildStyleProp = Utils.buildStyleProp,
+  addStringToTemplate = Utils.addStringToTemplate,
+  addQuasiToTemplate = Utils.addQuasiToTemplate,
+  addExpressionToTemplate = Utils.addExpressionToTemplate
 
 var propsToOmit = {
   tag: true,
@@ -75,9 +78,12 @@ module.exports = function (node) {
     var inlineStyleBabelProperties = []
     var props = []
 
+    // console.log("node:", node)
+
     if (node.openingElement.attributes != null) {
       node.openingElement.attributes.forEach((attribute) => {
         var name = attribute.name.name
+        // console.log("prop name:", name)
 
         if (name in propsToOmit) {
           return
@@ -145,6 +151,47 @@ module.exports = function (node) {
         else if (tagPrefixRegex.test(name)) {
           attribute.name.name = name.replace(tagPrefixRegex, "")
           props.push(attribute)
+        }
+        else if (name === "html" && node.children && node.children.length > 0) {
+          const quasis = []
+          const expressions = []
+          let text = ""
+
+          const finalize = (expr, str) => {
+            quasis.push(t.templateElement({ raw: text }))
+            expressions.push(expr)
+            text = str
+          }
+
+          // Add children array to templateLiteral
+          node.children.forEach((child) => {
+            if (t.isJSXExpressionContainer(child)) {
+              finalize(child.expression, "")
+            }
+            else if (t.isJSXText(child)) {
+              text += child.value
+            }
+          })
+
+          quasis.push(t.templateElement({ raw: `${text}` }))
+
+          // Set dangerouslySetInnerHTML to templateLiteral'd children
+          props.push(
+            t.jsxAttribute(
+              t.jsxIdentifier("dangerouslySetInnerHTML"),
+              t.jsxExpressionContainer(
+                t.objectExpression([
+                  t.objectProperty(
+                    t.stringLiteral("__html"),
+                    t.templateLiteral(quasis, expressions)
+                  ),
+                ])
+              )
+            )
+          )
+
+          // Remove children
+          node.children = []
         }
         else {
           props.push(attribute)
