@@ -50,9 +50,10 @@ export function buildClassNamePropFunction(t, cssObject) {
  * @param {babel.types} t
  * @param {Object} cssObject
  * @param {Object} keyAliases
+ * @param {any} otherClassName
  * @return {any} className prop with styles
  */
-function buildClassNamePropFunction(t, cssObject, keyAliases) {
+function buildClassNamePropFunction(t, cssObject, keyAliases, otherClassName) {
   var objectProperties = Object.keys(cssObject).map((key) => {
     var value = cssObject[key]
 
@@ -66,17 +67,41 @@ function buildClassNamePropFunction(t, cssObject, keyAliases) {
     return t.objectProperty(t.identifier(key), value)
   })
 
+  const cssLiteral = objectStylesToTemplate(objectProperties)
+
+  // Combine passed in className and cssLiteral
+  if (otherClassName != null) {
+    const quasis = []
+    const expressions = []
+    let text = ""
+
+    const finalize = (expr, str) => {
+      quasis.push(t.templateElement({ raw: text }))
+      expressions.push(expr)
+      text = str
+    }
+
+    if (t.isStringLiteral(otherClassName)) {
+      text += `${otherClassName.value} `
+    }
+    else if (t.isExpression(otherClassName)) {
+      finalize(otherClassName, " ")
+    }
+
+    finalize(cssLiteral, "")
+
+    quasis.push(t.templateElement({ raw: `${text}` }))
+
+    return t.jSXAttribute(
+      t.jSXIdentifier("className"),
+      t.jSXExpressionContainer(t.templateLiteral(quasis, expressions))
+    )
+  }
+
+  // No user-passed in className, so
   return t.jSXAttribute(
     t.jSXIdentifier("className"),
-    t.jSXExpressionContainer(
-      objectStylesToTemplate(objectProperties)
-      // t.callExpression(
-      //     t.identifier('css'),
-      //     [
-      //         t.objectExpression(objectProperties)
-      //     ]
-      // )
-    )
+    t.jSXExpressionContainer(cssLiteral)
   )
 }
 

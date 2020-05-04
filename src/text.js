@@ -77,6 +77,7 @@ module.exports = function (node) {
     var inlineStyleObject = {}
     var inlineStyleBabelProperties = []
     var props = []
+    let otherClassNames
 
     // console.log("node:", node)
 
@@ -193,6 +194,16 @@ module.exports = function (node) {
           // Remove children
           node.children = []
         }
+        else if (name === "className") {
+          if (t.isJSXExpressionContainer(attribute.value)) {
+            otherClassNames = attribute.value.expression
+          }
+          else if (t.isStringLiteral(attribute.value)) {
+            otherClassNames = attribute.value
+          }
+
+          // Note: skip adding to props
+        }
         else {
           props.push(attribute)
         }
@@ -202,7 +213,8 @@ module.exports = function (node) {
     var classNameProp = buildClassNamePropFunction(
       t,
       cssProperties,
-      cssPropertyMap
+      cssPropertyMap,
+      otherClassNames
     )
     classNameProp.value.expression.loc = node.loc
     props.push(classNameProp)

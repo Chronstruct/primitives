@@ -35,6 +35,8 @@ module.exports = function (node) {
     var inlineStyleBabelProperties = []
     var props = []
 
+    let otherClassNames
+
     if (node.openingElement.attributes != null) {
       node.openingElement.attributes.forEach((attribute) => {
         var name = attribute.name.name
@@ -84,13 +86,28 @@ module.exports = function (node) {
           attribute.name.name = name.replace(tagPrefixRegex, "")
           props.push(attribute)
         }
+        else if (name === "className") {
+          if (t.isJSXExpressionContainer(attribute.value)) {
+            otherClassNames = attribute.value.expression
+          }
+          else if (t.isStringLiteral(attribute.value)) {
+            otherClassNames = attribute.value
+          }
+
+          // Note: skip adding to props
+        }
         else {
           props.push(attribute)
         }
       })
     }
 
-    var classNameProp = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var classNameProp = buildClassNamePropFunction(
+      t,
+      cssProperties,
+      cssProps,
+      otherClassNames
+    )
     classNameProp.value.expression.loc = node.loc
     props.push(classNameProp)
 
