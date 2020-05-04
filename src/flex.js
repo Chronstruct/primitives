@@ -187,6 +187,7 @@ module.exports = function (node, tagName) {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               cssProperties,
+              inlineStyleObject,
               property.key.name,
               property.value,
               cssProps
@@ -201,13 +202,19 @@ module.exports = function (node, tagName) {
         else if (name in cssProps) {
           addCssProperty(
             cssProperties,
+            inlineStyleObject,
             cssProps[name],
             attribute.value,
             cssProps
           )
         }
         else if (name in booleanProps) {
-          addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
+          addBooleanPropertySet(
+            cssProperties,
+            inlineStyleObject,
+            attribute,
+            booleanProps[name]
+          )
         }
         else if (name === "grow") {
           addBooleanProperty(

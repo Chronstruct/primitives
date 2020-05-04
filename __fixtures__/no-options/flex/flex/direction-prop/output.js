@@ -3,5 +3,6 @@
   align-content: flex-start;
   position: relative;
   flex-shrink: 0;
-  flex-direction: ${someVar};
-`} />;
+`} style={{
+  flexDirection: someVar
+}} />;

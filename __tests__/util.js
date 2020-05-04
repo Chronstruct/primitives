@@ -15,7 +15,7 @@ it("addCssProperty with NumericLiteral", () => {
 
   var expectedOutput = { [key]: value }
 
-  addCssProperty(input, key, value)
+  addCssProperty(input, {}, key, value)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -49,7 +49,7 @@ it("addCssProperty with ObjectExpression", () => {
     ]),
   }
 
-  addCssProperty(input, key, value)
+  addCssProperty(input, {}, key, value)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -80,7 +80,7 @@ it("addObjectValueToCSS handles var keys", () => {
     ]),
   }
 
-  addCssProperty(input, key, value)
+  addCssProperty(input, {}, key, value)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -109,7 +109,7 @@ it("addObjectValueToCSS handles computed var keys", () => {
     ]),
   }
 
-  addCssProperty(input, key, value)
+  addCssProperty(input, {}, key, value)
 
   expect(input).toStrictEqual(expectedOutput)
 })
@@ -124,7 +124,7 @@ it("addBooleanPropertySet `center={true}`", () => {
   )
   var propertiesToAdd = { someKey: t.numericLiteral(1) }
 
-  addBooleanPropertySet(input, attribute, propertiesToAdd)
+  addBooleanPropertySet(input, {}, attribute, propertiesToAdd)
 
   expect(input).toStrictEqual(propertiesToAdd)
 })
@@ -134,7 +134,7 @@ it("addBooleanPropertySet `center`", () => {
   var attribute = t.jsxAttribute(t.jsxIdentifier("center"))
   var propertiesToAdd = { someKey: t.numericLiteral(1) }
 
-  addBooleanPropertySet(input, attribute, propertiesToAdd)
+  addBooleanPropertySet(input, {}, attribute, propertiesToAdd)
 
   expect(input).toStrictEqual(propertiesToAdd)
 })

@@ -73,12 +73,6 @@ module.exports = function (node) {
     var inlineStyleBabelProperties = []
     var props = []
 
-    // var css = buildDefaultCssProp(t, defaultCss)
-    //var className = buildClassNameProp(t, defaultCss)
-    //className.value.expression.loc = node.loc
-    //var cssTemplate = className.value.expression.quasi
-    //var props = [className]
-
     if (node.openingElement.attributes != null) {
       node.openingElement.attributes.forEach((attribute) => {
         var name = attribute.name.name
@@ -88,7 +82,12 @@ module.exports = function (node) {
         }
         else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
-            addCssProperty(cssProperties, property.key.name, property.value)
+            addCssProperty(
+              cssProperties,
+              inlineStyleObject,
+              property.key.name,
+              property.value
+            )
           })
         }
         else if (name === "inlineStyle") {
@@ -97,10 +96,20 @@ module.exports = function (node) {
           )
         }
         else if (name in cssPropertyMap) {
-          addCssProperty(cssProperties, cssPropertyMap[name], attribute.value)
+          addCssProperty(
+            cssProperties,
+            inlineStyleObject,
+            cssPropertyMap[name],
+            attribute.value
+          )
         }
         else if (name in booleanProps) {
-          addBooleanPropertySet(cssProperties, attribute, booleanProps[name])
+          addBooleanPropertySet(
+            cssProperties,
+            inlineStyleObject,
+            attribute,
+            booleanProps[name]
+          )
         }
         else if (name === "grow") {
           addBooleanProperty(

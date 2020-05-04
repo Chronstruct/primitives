@@ -45,6 +45,7 @@ module.exports = function (node) {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               cssProperties,
+              inlineStyleObject,
               property.key.name,
               property.value,
               cssProps
@@ -59,6 +60,7 @@ module.exports = function (node) {
         else if (name in cssProps) {
           addCssProperty(
             cssProperties,
+            inlineStyleObject,
             cssProps[name],
             attribute.value,
             cssProps

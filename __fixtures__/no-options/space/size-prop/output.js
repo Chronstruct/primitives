@@ -23,8 +23,9 @@
   <div className={css`
   flex-grow: 0;
   flex-shrink: 0;
-  flex-basis: ${someVar};
-`} />
+`} style={{
+    flexBasis: someVar
+  }} />
 
   {
     /* size expression templateLiteral */
@@ -32,8 +33,9 @@
   <div className={css`
   flex-grow: 0;
   flex-shrink: 0;
-  flex-basis: ${`${someVar}px`};
-`} />
+`} style={{
+    flexBasis: `${someVar}px`
+  }} />
 
   {
     /* size expression conditionalExpression */
@@ -41,8 +43,9 @@
   <div className={css`
   flex-grow: 0;
   flex-shrink: 0;
-  flex-basis: ${`${someVar ? true : false}`};
-`} />
+`} style={{
+    flexBasis: `${someVar ? true : false}`
+  }} />
 
   {
     /* size object */

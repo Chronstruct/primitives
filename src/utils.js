@@ -245,27 +245,51 @@ function addObjectValueToCSS(objectExpression, cssObject, cssKey, valueMap) {
 
 /**
  * @param {Object} cssProperties
+ * @param {Object} dynamicStyle
  * @param {string} key
  * @param {any} propValue
  * @return {any} className prop with styles
  */
-function addCssProperty(cssProperties, key, propValue, valueMap) {
+function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
   //   console.log("cssProperties", cssProperties)
   //   console.log("key", key)
   //   console.log("propValue", propValue)
 
   if (t.isJSXExpressionContainer(propValue)) {
-    var { expression } = propValue
-
-    if (t.isObjectExpression(expression)) {
-      addObjectValueToCSS(expression, cssProperties, key, valueMap)
-    }
-    else {
-      cssProperties[key] = expression
-    }
+    addCssProperty(
+      cssProperties,
+      dynamicStyle,
+      key,
+      propValue.expression,
+      valueMap
+    )
   }
+  // e.g. grow={{_: true, hover: false}}
   else if (t.isObjectExpression(propValue)) {
     addObjectValueToCSS(propValue, cssProperties, key, valueMap)
+  }
+  // e.g. grow={someVar}
+  else if (t.isIdentifier(propValue)) {
+    // By convention, CONSTANT_VARS will be evaluated for static extraction
+    if (allCapsRegex.test(propValue.name)) {
+      cssProperties[key] = propValue
+    }
+    // All other vars will be added to dynamic styles
+    else {
+      dynamicStyle[key] = propValue
+    }
+  }
+  // e.g. grow={isTrue ? true : false}
+  else if (t.isConditionalExpression(propValue)) {
+    dynamicStyle[key] = propValue
+  }
+  // e.g. grow={isTrue && true}
+  else if (t.isLogicalExpression(propValue)) {
+    dynamicStyle[key] = propValue
+  }
+  // e.g. grow={`${someVar}`}
+  else if (t.isTemplateLiteral(propValue)) {
+    dynamicStyle[key] = propValue
   }
   else {
     cssProperties[key] = propValue
@@ -274,49 +298,41 @@ function addCssProperty(cssProperties, key, propValue, valueMap) {
 
 /**
  * @param {Object} cssProperties
+ * @param {Object} dynamicStyle
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
-function addCssProperties(cssProperties, propertiesToAdd) {
+function addCssProperties(cssProperties, dynamicStyle, propertiesToAdd) {
   Object.keys(propertiesToAdd).forEach((key) => {
-    addCssProperty(cssProperties, key, propertiesToAdd[key])
+    addCssProperty(cssProperties, dynamicStyle, key, propertiesToAdd[key])
   })
 }
 
 /**
  * @param {Object} cssProperties
+ * @param {Object} dynamicStyle
  * @param {Types.JSXAttribute} jsxAttribute
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
-function addBooleanPropertySet(cssProperties, jsxAttribute, propertiesToAdd) {
+function addBooleanPropertySet(
+  cssProperties,
+  dynamicStyle,
+  jsxAttribute,
+  propertiesToAdd
+) {
   var { value } = jsxAttribute
   //   console.log("attribute", attribute)
 
   if (isBooleanProp(jsxAttribute)) {
-    addCssProperties(cssProperties, propertiesToAdd)
+    addCssProperties(cssProperties, dynamicStyle, propertiesToAdd)
   }
   else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
 
     if (t.isBooleanLiteral(expression) && expression.value === true) {
-      addCssProperties(cssProperties, propertiesToAdd)
+      addCssProperties(cssProperties, dynamicStyle, propertiesToAdd)
     }
-    /*
-        else if (t.isIdentifier(expression)) {
-            addExpressionToTemplate(cssTemplate, t.conditionalExpression(
-                t.binaryExpression(
-                    '===',
-                    t.identifier(expression.name),
-                    t.booleanLiteral(true),
-                ),
-                t.stringLiteral(consequent),
-                t.stringLiteral(alternate),
-            ))
-
-            addQuasiToTemplate(cssTemplate, t.templateElement({raw: '', cooked: ''}))
-        }
-        */
   }
 }
 
@@ -343,12 +359,12 @@ function addBooleanProperty(
 ) {
   var { value } = jsxAttribute
 
-  if (isBooleanProp(jsxAttribute)) {
-    addCssProperty(cssProperties, key, valueMap[true])
-  }
   // e.g. grow="1" (NOT SUPPORTED by default)
-  else if (config && config.allowString && isStringProp(jsxAttribute)) {
-    addCssProperty(cssProperties, key, value)
+  if (isStringProp(jsxAttribute) && !(config && config.allowString)) {
+    return
+  }
+  else if (isBooleanProp(jsxAttribute)) {
+    addCssProperty(cssProperties, dynamicStyle, key, valueMap[true])
   }
   else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
@@ -356,44 +372,32 @@ function addBooleanProperty(
     // console.log(expression)
 
     // e.g. grow={1} (NOT SUPPORTED by default)
-    if (config && config.allowNumber && t.isNumericLiteral(expression)) {
-      addCssProperty(cssProperties, key, expression)
+    if (t.isNumericLiteral(expression) && !(config && config.allowNumber)) {
+      return
     }
     // e.g. grow={"1"} (NOT SUPPORTED by default)
-    else if (config && config.allowString && t.isStringLiteral(expression)) {
-      addCssProperty(cssProperties, key, expression)
-    }
-    // e.g. grow={someVar}
-    else if (t.isIdentifier(expression)) {
-      // By convention, CONSTANT_VARS will be evaluated for static extraction
-      if (allCapsRegex.test(expression.name)) {
-        addCssProperty(cssProperties, key, expression)
-      }
-      // All other vars will be added to dynamic styles
-      else {
-        dynamicStyle[key] = expression
-      }
+    else if (t.isStringLiteral(expression) && !(config && config.allowString)) {
+      return
     }
     // e.g. grow={true}
     else if (t.isBooleanLiteral(expression)) {
-      addCssProperty(cssProperties, key, valueMap[expression.value])
+      addCssProperty(
+        cssProperties,
+        dynamicStyle,
+        key,
+        valueMap[expression.value]
+      )
     }
     // e.g. grow={{'': true, 'hover': false}}
     else if (t.isObjectExpression(expression)) {
-      addCssProperty(cssProperties, key, expression, valueMap)
+      addCssProperty(cssProperties, dynamicStyle, key, expression, valueMap)
     }
-    // e.g. grow={isTrue ? true : false}
-    else if (t.isConditionalExpression(expression)) {
-      dynamicStyle[key] = expression
+    else {
+      addCssProperty(cssProperties, dynamicStyle, key, expression)
     }
-    // e.g. grow={isTrue && true}
-    else if (t.isLogicalExpression(expression)) {
-      dynamicStyle[key] = expression
-    }
-    // e.g. grow={`${someVar}`}
-    else if (t.isTemplateLiteral(expression)) {
-      dynamicStyle[key] = expression
-    }
+  }
+  else {
+    addCssProperty(cssProperties, dynamicStyle, key, value)
   }
 }
 
