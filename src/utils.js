@@ -394,11 +394,21 @@ function addBooleanProperty(
       addCssProperty(cssProperties, dynamicStyle, key, expression, valueMap)
     }
     else {
-      addCssProperty(cssProperties, dynamicStyle, key, expression)
+      addCssProperty(
+        cssProperties,
+        dynamicStyle,
+        key,
+        expression in valueMap ? valueMap[expression] : expression
+      )
     }
   }
   else {
-    addCssProperty(cssProperties, dynamicStyle, key, value)
+    addCssProperty(
+      cssProperties,
+      dynamicStyle,
+      key,
+      value in valueMap ? valueMap[value] : value
+    )
   }
 }
 

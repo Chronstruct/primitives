@@ -26,6 +26,7 @@ var cssPropertyMap = {
   spacing: "letterSpacing",
   transform: "textTransform",
   weight: "fontWeight",
+  userSelect: "userSelect",
   // ellipsis
   // underline
 }
@@ -122,6 +123,23 @@ module.exports = function (node) {
               true: t.numericLiteral(1),
               false: t.numericLiteral(0),
             }
+          )
+        }
+        else if (name === "selectable") {
+          addBooleanProperty(
+            cssProperties,
+            inlineStyleObject,
+            attribute,
+            "userSelect",
+            {
+              true: t.stringLiteral("text"),
+              false: t.stringLiteral("none"),
+              text: t.stringLiteral("text"),
+              none: t.stringLiteral("none"),
+              auto: t.stringLiteral("auto"),
+              all: t.stringLiteral("all"),
+            },
+            { allowString: true }
           )
         }
         else if (tagPrefixRegex.test(name)) {
