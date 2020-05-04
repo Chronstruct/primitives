@@ -303,7 +303,6 @@ module.exports = function (node, tagName) {
     return props
   }
 
-  console.log(flexPropMap)
   if (tagName === "view" || tagName === "box" || tagName === "BOX") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
