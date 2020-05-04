@@ -15,7 +15,44 @@ var propsToOmit = {
   tag: true,
 }
 
-var propsToUse = {
+var booleanProps = {
+  center: {
+    alignItems: t.stringLiteral("center"),
+    justifyContent: t.stringLiteral("center"),
+    //consequent: 'align-items: center;justify-content: center;',
+    //alternate: '',
+  },
+  hidden: {
+    display: t.stringLiteral("none"),
+    //consequent: 'display: none;',
+    //alternate: '',
+  },
+  inline: {
+    display: t.stringLiteral("inline-flex"),
+    //consequent: 'display: inline-flex;',
+    //alternate: '',
+  },
+  fit: {
+    height: t.stringLiteral("100%"),
+    width: t.stringLiteral("100%"),
+    //consequent: 'height: 100%;width: 100%;',
+    //alternate: '',
+  },
+  absoluteFill: {
+    position: t.stringLiteral("absolute"),
+    top: t.numericLiteral(0),
+    right: t.numericLiteral(0),
+    bottom: t.numericLiteral(0),
+    left: t.numericLiteral(0),
+    //consequent: 'position: absolute;top: 0;right: 0;bottom: 0;left: 0;',
+    //alternate: '',
+  },
+}
+
+const propMap = {
+  paddingVertical: ["paddingTop", "paddingBottom"],
+  paddingHorizontal: ["paddingRight", "paddingLeft"],
+
   top: "top",
   right: "right",
   bottom: "bottom",
@@ -59,43 +96,7 @@ var propsToUse = {
   zIndex: "zIndex",
 }
 
-var flexPropsToUse = Object.assign({}, propsToUse, {
-  direction: "flexDirection",
-})
-
-var booleanProps = {
-  center: {
-    alignItems: t.stringLiteral("center"),
-    justifyContent: t.stringLiteral("center"),
-    //consequent: 'align-items: center;justify-content: center;',
-    //alternate: '',
-  },
-  hidden: {
-    display: t.stringLiteral("none"),
-    //consequent: 'display: none;',
-    //alternate: '',
-  },
-  inline: {
-    display: t.stringLiteral("inline-flex"),
-    //consequent: 'display: inline-flex;',
-    //alternate: '',
-  },
-  fit: {
-    height: t.stringLiteral("100%"),
-    width: t.stringLiteral("100%"),
-    //consequent: 'height: 100%;width: 100%;',
-    //alternate: '',
-  },
-  absoluteFill: {
-    position: t.stringLiteral("absolute"),
-    top: t.numericLiteral(0),
-    right: t.numericLiteral(0),
-    bottom: t.numericLiteral(0),
-    left: t.numericLiteral(0),
-    //consequent: 'position: absolute;top: 0;right: 0;bottom: 0;left: 0;',
-    //alternate: '',
-  },
-}
+const flexPropMap = { ...propMap, direction: "flexDirection" }
 
 // var defaultFlexCss =
 //   "display: flex;flex-shrink: 0;align-content: flex-start;position: relative;"
@@ -159,7 +160,7 @@ var defaultRow = {
 }
 
 module.exports = function (node, tagName) {
-  function buildProps(node, defaultCss, cssProps) {
+  function buildProps(node, defaultCss, cssPropMap) {
     // var css = buildDefaultCssProp(t, defaultCss)
     var cssProperties = Object.assign({}, defaultCss)
     var inlineStyleObject = {}
@@ -191,8 +192,7 @@ module.exports = function (node, tagName) {
               cssProperties,
               inlineStyleObject,
               property.key.name,
-              property.value,
-              cssProps
+              property.value
             )
           })
         }
@@ -201,14 +201,27 @@ module.exports = function (node, tagName) {
             ...attribute.value.expression.properties
           )
         }
-        else if (name in cssProps) {
-          addCssProperty(
-            cssProperties,
-            inlineStyleObject,
-            cssProps[name],
-            attribute.value,
-            cssProps
-          )
+        else if (name in cssPropMap) {
+          const mappedProperty = cssPropMap[name]
+
+          if (Array.isArray(mappedProperty)) {
+            mappedProperty.forEach((prop) => {
+              addCssProperty(
+                cssProperties,
+                inlineStyleObject,
+                prop,
+                attribute.value
+              )
+            })
+          }
+          else {
+            addCssProperty(
+              cssProperties,
+              inlineStyleObject,
+              mappedProperty,
+              attribute.value
+            )
+          }
         }
         else if (name in booleanProps) {
           addBooleanPropertySet(
@@ -267,7 +280,7 @@ module.exports = function (node, tagName) {
     var classNameProp = buildClassNamePropFunction(
       t,
       cssProperties,
-      cssProps,
+      cssPropMap,
       otherClassNames
     )
     classNameProp.value.expression.loc = node.loc
@@ -290,28 +303,21 @@ module.exports = function (node, tagName) {
     return props
   }
 
+  console.log(flexPropMap)
   if (tagName === "view" || tagName === "box" || tagName === "BOX") {
     renameTag(node)
-    node.openingElement.attributes = buildProps(
-      node,
-      defaultFlex,
-      flexPropsToUse
-    )
+    node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
   }
   else if (tagName === "col" || tagName === "v") {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultCol, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultCol, propMap)
   }
   else if (tagName === "row" || tagName === "h") {
     renameTag(node)
-    node.openingElement.attributes = buildProps(node, defaultRow, propsToUse)
+    node.openingElement.attributes = buildProps(node, defaultRow, propMap)
   }
   else if (tagName === "flex" || tagName === "stack") {
     renameTag(node)
-    node.openingElement.attributes = buildProps(
-      node,
-      defaultFlex,
-      flexPropsToUse
-    )
+    node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
   }
 }
