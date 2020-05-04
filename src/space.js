@@ -4,13 +4,14 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
+  tagPrefixRegex = Utils.tagPrefixRegex,
   addBooleanProperty = Utils.addBooleanProperty,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction,
   buildStyleProp = Utils.buildStyleProp
 
 var propsToOmit = {
-  as: true,
+  tag: true,
 }
 
 var cssProps = {
@@ -78,6 +79,10 @@ module.exports = function (node) {
             },
             { allowNumber: true }
           )
+        }
+        else if (tagPrefixRegex.test(name)) {
+          attribute.name.name = name.replace(tagPrefixRegex, "")
+          props.push(attribute)
         }
         else {
           props.push(attribute)

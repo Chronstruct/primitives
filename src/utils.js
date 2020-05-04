@@ -6,6 +6,7 @@ var objectStylesToTemplate = require("./objectStylesToTemplate")
 
 // from https://stackoverflow.com/questions/43224835
 const allCapsRegex = /^[A-Z]+(?:_[A-Z]+)*$/
+const tagPrefixRegex = /^tag-/
 
 /**
  * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
@@ -156,7 +157,7 @@ function renameTag(node, defaultTag = "div") {
 
   if (node.openingElement.attributes != null) {
     var name = node.openingElement.attributes.find((prop) => {
-      return prop.name && prop.name.name === "as"
+      return prop.name && prop.name.name === "tag"
     })
 
     if (name !== undefined) {
@@ -166,7 +167,7 @@ function renameTag(node, defaultTag = "div") {
         tagName = val
       }
       else {
-        console.log("invalid `as` value. No variables allowed.")
+        console.log("invalid `tag` value. No variables allowed.")
       }
     }
   }
@@ -437,6 +438,7 @@ exports.addStringToTemplate = addStringToTemplate
 exports.addQuasiToTemplate = addQuasiToTemplate
 exports.addExpressionToTemplate = addExpressionToTemplate
 exports.renameTag = renameTag
+exports.tagPrefixRegex = tagPrefixRegex
 exports.addCssProperty = addCssProperty
 exports.addCssProperties = addCssProperties
 exports.addBooleanPropertySet = addBooleanPropertySet

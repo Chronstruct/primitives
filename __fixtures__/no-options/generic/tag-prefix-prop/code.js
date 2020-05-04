@@ -1,0 +1,1 @@
+<view tag="button" tag-disabled={true} />

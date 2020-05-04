@@ -1,1 +1,1 @@
-<view as={"nav"}/>
+<view tag={"nav"}/>
