@@ -2,6 +2,9 @@
 {/* size expression identifier */}
 <view grow={someVar}/>
 
+{/* size member expression */}
+<view grow={this.props.grow}/>
+
 {/* size expression templateLiteral */}
 <view height={`${someVar}px`}/>
 

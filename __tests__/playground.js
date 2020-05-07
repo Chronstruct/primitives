@@ -9,14 +9,14 @@ it("A test suite must contain at least one test", () => {
 
 // it("playground", () => {
 //   // var input = `<space shrink={\`\${someVar ? true : false}\`}/>`
-//   // var input = `<space shrink={someVar ? true : false}/>`
+//   var input = `<space shrink={this.props.shrink}/>`
 //   // var input = `<text className={css\`background: red;\`}/>`
 //   // var input = `<text className={someVar}/>`
 //   // var input = `<text className={"someString"}/>`
 //   // var input = `<box grow={SOME_CONST && true}/>`
 //   // var input = `<box grow={SOME_CONST && someVar}/>`
 //   // var input = `<box paddingVertical={SOME_VAR ? someVar : 1}/>`
-//   var input = `<box paddingVertical={{_: 1, 'hover': 200}}/>`
+//   // var input = `<box paddingVertical={{_: 1, 'hover': 200}}/>`
 
 //   const { code } = babel.transform(input, options)
 

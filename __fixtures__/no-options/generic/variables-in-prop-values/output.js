@@ -12,6 +12,18 @@
   }} />
 
   {
+    /* size member expression */
+  }
+  <div className={css`
+  display: flex;
+  align-content: flex-start;
+  position: relative;
+  flex-shrink: 0;
+`} style={{
+    flexGrow: this.props.grow
+  }} />
+
+  {
     /* size expression templateLiteral */
   }
   <div className={css`

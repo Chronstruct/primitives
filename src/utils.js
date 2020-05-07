@@ -367,6 +367,10 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
       dynamicStyle[key] = propValue
     }
   }
+  // e.g. grow={this.props.grow}
+  else if (t.isMemberExpression(propValue)) {
+    dynamicStyle[key] = propValue
+  }
   else {
     cssProperties[key] = propValue
   }
