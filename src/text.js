@@ -73,8 +73,8 @@ var defaultCss = {
 
 module.exports = function (node) {
   function buildProps(node, defaultCss) {
-    var cssProperties = Object.assign({}, defaultCss)
-    var inlineStyleObject = {}
+    var staticStyle = Object.assign({}, defaultCss)
+    var dynamicStyle = {}
     var inlineStyleBabelProperties = []
     var props = []
     let otherClassNames
@@ -92,8 +92,8 @@ module.exports = function (node) {
         else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
-              cssProperties,
-              inlineStyleObject,
+              staticStyle,
+              dynamicStyle,
               property.key.name,
               property.value
             )
@@ -106,36 +106,30 @@ module.exports = function (node) {
         }
         else if (name in cssPropertyMap) {
           addCssProperty(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             cssPropertyMap[name],
             attribute.value
           )
         }
         else if (name in booleanProps) {
           addBooleanPropertySet(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             attribute,
             booleanProps[name]
           )
         }
         else if (name === "grow") {
-          addBooleanProperty(
-            cssProperties,
-            inlineStyleObject,
-            attribute,
-            "flexGrow",
-            {
-              true: t.numericLiteral(1),
-              false: t.numericLiteral(0),
-            }
-          )
+          addBooleanProperty(staticStyle, dynamicStyle, attribute, "flexGrow", {
+            true: t.numericLiteral(1),
+            false: t.numericLiteral(0),
+          })
         }
         else if (name === "selectable") {
           addBooleanProperty(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             attribute,
             "userSelect",
             {
@@ -212,7 +206,7 @@ module.exports = function (node) {
 
     var classNameProp = buildClassNamePropFunction(
       t,
-      cssProperties,
+      staticStyle,
       cssPropertyMap,
       otherClassNames
     )
@@ -221,12 +215,12 @@ module.exports = function (node) {
 
     // Add inline styles prop if there are styles to add
     if (
-      Object.keys(inlineStyleObject).length > 0 ||
+      Object.keys(dynamicStyle).length > 0 ||
       inlineStyleBabelProperties.length > 0
     ) {
       var styleProp = buildStyleProp(
         t,
-        inlineStyleObject,
+        dynamicStyle,
         inlineStyleBabelProperties
       )
       styleProp.value.expression.loc = node.loc

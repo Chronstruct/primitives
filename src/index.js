@@ -9,8 +9,10 @@ module.exports = function (babel) {
   var { types: t } = babel
 
   return {
+    // ---
     // below equates to `inherits: @babel/plugin-syntax-jsx;`
     // https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-jsx/src/index.js#L9
+    //
     manipulateOptions(opts, parserOpts) {
       // If the Typescript plugin already ran, it will have decided whether
       // or not this is a TSX file.
@@ -24,6 +26,7 @@ module.exports = function (babel) {
 
       parserOpts.plugins.push("jsx")
     },
+    // ---
     visitor: {
       Program: {
         enter(path, state) {
@@ -58,6 +61,7 @@ module.exports = function (babel) {
         switch (element.name) {
           case "view":
           case "col":
+          case "column":
           case "row":
           case "flex":
           case "box":

@@ -162,16 +162,16 @@ var defaultRow = {
 module.exports = function (node, tagName) {
   function buildProps(node, defaultCss, cssPropMap) {
     // var css = buildDefaultCssProp(t, defaultCss)
-    var cssProperties = Object.assign({}, defaultCss)
-    var inlineStyleObject = {}
+    var staticStyle = Object.assign({}, defaultCss)
+    var dynamicStyle = {}
     var inlineStyleBabelProperties = []
     var props = []
     let otherClassNames
 
-    //var className = buildClassNamePropFunction(t, cssProperties)
+    //var className = buildClassNamePropFunction(t, staticStyle)
     //className.value.expression.loc = node.loc
 
-    //var cssProperties = className.value.expression.arguments[0].properties
+    //var staticStyle = className.value.expression.arguments[0].properties
 
     //var props = [className]
 
@@ -189,8 +189,8 @@ module.exports = function (node, tagName) {
         else if (name === "style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
-              cssProperties,
-              inlineStyleObject,
+              staticStyle,
+              dynamicStyle,
               property.key.name,
               property.value
             )
@@ -206,18 +206,13 @@ module.exports = function (node, tagName) {
 
           if (Array.isArray(mappedProperty)) {
             mappedProperty.forEach((prop) => {
-              addCssProperty(
-                cssProperties,
-                inlineStyleObject,
-                prop,
-                attribute.value
-              )
+              addCssProperty(staticStyle, dynamicStyle, prop, attribute.value)
             })
           }
           else {
             addCssProperty(
-              cssProperties,
-              inlineStyleObject,
+              staticStyle,
+              dynamicStyle,
               mappedProperty,
               attribute.value
             )
@@ -225,16 +220,16 @@ module.exports = function (node, tagName) {
         }
         else if (name in booleanProps) {
           addBooleanPropertySet(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             attribute,
             booleanProps[name]
           )
         }
         else if (name === "grow") {
           addBooleanProperty(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             attribute,
             "flexGrow",
             {
@@ -246,8 +241,8 @@ module.exports = function (node, tagName) {
         }
         else if (name === "shrink") {
           addBooleanProperty(
-            cssProperties,
-            inlineStyleObject,
+            staticStyle,
+            dynamicStyle,
             attribute,
             "flexShrink",
             {
@@ -279,7 +274,7 @@ module.exports = function (node, tagName) {
 
     var classNameProp = buildClassNamePropFunction(
       t,
-      cssProperties,
+      staticStyle,
       cssPropMap,
       otherClassNames
     )
@@ -288,12 +283,12 @@ module.exports = function (node, tagName) {
 
     // Add inline styles prop if there are styles to add
     if (
-      Object.keys(inlineStyleObject).length > 0 ||
+      Object.keys(dynamicStyle).length > 0 ||
       inlineStyleBabelProperties.length > 0
     ) {
       var styleProp = buildStyleProp(
         t,
-        inlineStyleObject,
+        dynamicStyle,
         inlineStyleBabelProperties
       )
       styleProp.value.expression.loc = node.loc
@@ -307,7 +302,7 @@ module.exports = function (node, tagName) {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
   }
-  else if (tagName === "col" || tagName === "v") {
+  else if (tagName === "col" || tagName === "column" || tagName === "v") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultCol, propMap)
   }

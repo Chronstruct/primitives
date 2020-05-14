@@ -229,14 +229,14 @@ function addObjectValueToCSS(objectExpression, cssObject, cssKey, valueMap) {
       // I'd rather use the variable to let objectStylesToTemplate() handle [varName] as the key, but I don't know how.
       const varSafeKey = `\${${property.key.name}}`
 
-      // IS already in cssProperties
+      // IS already in staticStyle
       if (varSafeKey in cssObject) {
         // e.g. [HOVER]: { already: added; color: red; }
         cssObject[varSafeKey].properties.push(
           t.objectProperty(t.identifier(cssKey), value)
         )
       }
-      // ISN'T already in cssProperties
+      // ISN'T already in staticStyle
       else {
         // e.g. [HOVER]: { color: red; }
         cssObject[varSafeKey] = t.objectExpression([
@@ -251,14 +251,14 @@ function addObjectValueToCSS(objectExpression, cssObject, cssKey, valueMap) {
         // e.g. color: red;
         cssObject[cssKey] = value
       }
-      // IS already in cssProperties
+      // IS already in staticStyle
       else if (key in cssObject) {
         // e.g. hover: { already: added; color: red; }
         cssObject[key].properties.push(
           t.objectProperty(t.identifier(cssKey), value)
         )
       }
-      // ISN'T already in cssProperties
+      // ISN'T already in staticStyle
       else {
         // e.g. hover: { color: red; }
         cssObject[key] = t.objectExpression([
@@ -270,20 +270,20 @@ function addObjectValueToCSS(objectExpression, cssObject, cssKey, valueMap) {
 }
 
 /**
- * @param {Object} cssProperties
+ * @param {Object} staticStyle
  * @param {Object} dynamicStyle
  * @param {string} key
  * @param {any} propValue
  * @return {any} className prop with styles
  */
-function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
-  //   console.log("cssProperties", cssProperties)
+function addCssProperty(staticStyle, dynamicStyle, key, propValue, valueMap) {
+  //   console.log("staticStyle", staticStyle)
   //   console.log("key", key)
   //   console.log("propValue", propValue)
 
   if (t.isJSXExpressionContainer(propValue)) {
     addCssProperty(
-      cssProperties,
+      staticStyle,
       dynamicStyle,
       key,
       propValue.expression,
@@ -292,13 +292,13 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
   }
   // e.g. grow={{_: true, hover: false}}
   else if (t.isObjectExpression(propValue)) {
-    addObjectValueToCSS(propValue, cssProperties, key, valueMap)
+    addObjectValueToCSS(propValue, staticStyle, key, valueMap)
   }
   // e.g. grow={someVar}
   else if (t.isIdentifier(propValue)) {
     // By convention, CONSTANT_VARS will be evaluated for static extraction
     if (allCapsRegex.test(propValue.name)) {
-      cssProperties[key] = propValue
+      staticStyle[key] = propValue
     }
     // All other vars will be added to dynamic styles
     else {
@@ -323,7 +323,7 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
       if (
         identifiers.every((expression) => allCapsRegex.test(expression.name))
       ) {
-        cssProperties[key] = propValue
+        staticStyle[key] = propValue
       }
       else {
         dynamicStyle[key] = propValue
@@ -347,7 +347,7 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
     }
 
     if (identifiers.every((expression) => allCapsRegex.test(expression.name))) {
-      cssProperties[key] = propValue
+      staticStyle[key] = propValue
     }
     else {
       dynamicStyle[key] = propValue
@@ -361,7 +361,7 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
         allCapsRegex.test(expression.name)
       )
     ) {
-      cssProperties[key] = propValue
+      staticStyle[key] = propValue
     }
     else {
       dynamicStyle[key] = propValue
@@ -372,31 +372,31 @@ function addCssProperty(cssProperties, dynamicStyle, key, propValue, valueMap) {
     dynamicStyle[key] = propValue
   }
   else {
-    cssProperties[key] = propValue
+    staticStyle[key] = propValue
   }
 }
 
 /**
- * @param {Object} cssProperties
+ * @param {Object} staticStyle
  * @param {Object} dynamicStyle
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
-function addCssProperties(cssProperties, dynamicStyle, propertiesToAdd) {
+function addCssProperties(staticStyle, dynamicStyle, propertiesToAdd) {
   Object.keys(propertiesToAdd).forEach((key) => {
-    addCssProperty(cssProperties, dynamicStyle, key, propertiesToAdd[key])
+    addCssProperty(staticStyle, dynamicStyle, key, propertiesToAdd[key])
   })
 }
 
 /**
- * @param {Object} cssProperties
+ * @param {Object} staticStyle
  * @param {Object} dynamicStyle
  * @param {Types.JSXAttribute} jsxAttribute
  * @param {Object} propertiesToAdd
  * @return {any} className prop with styles
  */
 function addBooleanPropertySet(
-  cssProperties,
+  staticStyle,
   dynamicStyle,
   jsxAttribute,
   propertiesToAdd
@@ -405,13 +405,13 @@ function addBooleanPropertySet(
   //   console.log("attribute", attribute)
 
   if (isBooleanProp(jsxAttribute)) {
-    addCssProperties(cssProperties, dynamicStyle, propertiesToAdd)
+    addCssProperties(staticStyle, dynamicStyle, propertiesToAdd)
   }
   else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
 
     if (t.isBooleanLiteral(expression) && expression.value === true) {
-      addCssProperties(cssProperties, dynamicStyle, propertiesToAdd)
+      addCssProperties(staticStyle, dynamicStyle, propertiesToAdd)
     }
   }
 }
@@ -421,16 +421,16 @@ function addBooleanPropertySet(
 //   allowNumber: false,
 // }
 /**
- * @param {Object} cssProperties
+ * @param {Object} staticStyle
  * @param {Object} dynamicStyle
  * @param {JSXAttribute} jsxAttribute
- * @param {string} key - key to apply to cssProperties
+ * @param {string} key - key to apply to staticStyle
  * @param {{true: any, false: any}} valueMap - used to convert from boolean values
  * @param {{allowString: boolean, allowNumber: boolean}} config - which non-boolean values are allowed
  * @return {void}
  */
 function addBooleanProperty(
-  cssProperties,
+  staticStyle,
   dynamicStyle,
   jsxAttribute,
   key,
@@ -444,7 +444,7 @@ function addBooleanProperty(
     return
   }
   else if (isBooleanProp(jsxAttribute)) {
-    addCssProperty(cssProperties, dynamicStyle, key, valueMap[true])
+    addCssProperty(staticStyle, dynamicStyle, key, valueMap[true])
   }
   else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
@@ -461,20 +461,15 @@ function addBooleanProperty(
     }
     // e.g. grow={true}
     else if (t.isBooleanLiteral(expression)) {
-      addCssProperty(
-        cssProperties,
-        dynamicStyle,
-        key,
-        valueMap[expression.value]
-      )
+      addCssProperty(staticStyle, dynamicStyle, key, valueMap[expression.value])
     }
     // e.g. grow={{'': true, 'hover': false}}
     else if (t.isObjectExpression(expression)) {
-      addCssProperty(cssProperties, dynamicStyle, key, expression, valueMap)
+      addCssProperty(staticStyle, dynamicStyle, key, expression, valueMap)
     }
     else {
       addCssProperty(
-        cssProperties,
+        staticStyle,
         dynamicStyle,
         key,
         expression in valueMap ? valueMap[expression] : expression
@@ -483,7 +478,7 @@ function addBooleanProperty(
   }
   else {
     addCssProperty(
-      cssProperties,
+      staticStyle,
       dynamicStyle,
       key,
       value in valueMap ? valueMap[value] : value
