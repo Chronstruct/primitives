@@ -404,7 +404,7 @@ function addBooleanPropertySet(
   var { value } = jsxAttribute
   //   console.log("attribute", attribute)
 
-  if (isBooleanProp(jsxAttribute)) {
+  if (isShorthandBooleanProp(jsxAttribute)) {
     addCssProperties(staticStyle, dynamicStyle, propertiesToAdd)
   }
   else if (t.isJSXExpressionContainer(value)) {
@@ -443,7 +443,7 @@ function addBooleanProperty(
   if (isStringProp(jsxAttribute) && !(config && config.allowString)) {
     return
   }
-  else if (isBooleanProp(jsxAttribute)) {
+  else if (isShorthandBooleanProp(jsxAttribute)) {
     addCssProperty(staticStyle, dynamicStyle, key, valueMap[true])
   }
   else if (isExpressionProp(jsxAttribute)) {
@@ -491,7 +491,7 @@ function addBooleanProperty(
  * @param {JSXAttribute} jsxAttribute
  * @return {boolean}
  */
-function isBooleanProp(jsxAttribute) {
+function isShorthandBooleanProp(jsxAttribute) {
   return jsxAttribute.value === null
 }
 
@@ -513,6 +513,74 @@ function isStringProp(jsxAttribute) {
   return t.isStringLiteral(jsxAttribute.value)
 }
 
+/* ---------- ANIMATE ----------- */
+
+const animatePropMap = {
+  duration: "animationDuration",
+  delay: "animationDelay",
+  direction: "animationDirection",
+  easing: "animationTimingFunction",
+  persist: "animationFillMode",
+  // repeat: "animationIterationCount",
+}
+
+let keyframeIdCounter = 0
+
+/**
+ * @param {Object} staticStyle
+ * @param {Object} dynamicStyle
+ * @param {Types.JSXAttribute} jsxAttribute
+ * @return {any} className prop with styles
+ */
+function handleAnimate(staticStyle, dynamicStyle, jsxAttribute) {
+  var { value } = jsxAttribute
+
+  value.expression.properties.forEach((property) => {
+    const { name } = property.key
+
+    if (name in animatePropMap) {
+      const mappedPropertyName = animatePropMap[name]
+
+      addCssProperty(
+        staticStyle,
+        dynamicStyle,
+        mappedPropertyName,
+        property.value
+      )
+    }
+    else if (name === "repeat") {
+      const { value } = property
+
+      // when repeat === true, set it to "infinite"
+      if (t.isBooleanLiteral(value) && value.value === true) {
+        staticStyle["animationIterationCount"] = t.stringLiteral("infinite")
+      }
+      else {
+        addCssProperty(
+          staticStyle,
+          dynamicStyle,
+          "animationIterationCount",
+          property.value
+        )
+      }
+    }
+    else if (name === "keyframes") {
+      const id = `kf${keyframeIdCounter++}`
+
+      // add animation name
+      addCssProperty(
+        staticStyle,
+        dynamicStyle,
+        "animationName",
+        t.stringLiteral(id)
+      )
+
+      // add keyframes
+      staticStyle[`@keyframes ${id}`] = property.value
+    }
+  })
+}
+
 exports.buildDefaultCssProp = buildDefaultCssProp
 exports.buildClassNamePropFunction = buildClassNamePropFunction
 exports.buildClassNameProp = buildClassNameProp
@@ -527,3 +595,4 @@ exports.addCssProperty = addCssProperty
 exports.addCssProperties = addCssProperties
 exports.addBooleanPropertySet = addBooleanPropertySet
 exports.addBooleanProperty = addBooleanProperty
+exports.handleAnimate = handleAnimate

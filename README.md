@@ -1,5 +1,11 @@
 # Primitives
 
+css was built for a world of templates and pages, and it works really well in this setting. But today, we're writing and building with components.
+
+In a perfect component-world, everything would by dynamic. Props are variables, after all, and we like to make style and layout adjustments based on these props. Buuut, the web is different from native: users have to "install" our app every visit to see it. CSS is an optimization. It allows us to extract configuration statically, then send it to the client in a more performant way than if it was sent as runtime code.
+
+---
+
 Wild West with its styles and div/spans that can be basically anything. No clear separation of responsibility, with css affecting layout as well as tags (multiple vectors/sources of truth). Good for pages, maybe, and able to get by with conventions like BEM, but feels off in a component world.
 
 ---

@@ -44,7 +44,7 @@ module.exports = function (node) {
         if (name in propsToOmit) {
           return
         }
-        else if (name === "style") {
+        else if (name === "style" || name === "_style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               staticStyle,
@@ -55,7 +55,7 @@ module.exports = function (node) {
             )
           })
         }
-        else if (name === "inlineStyle") {
+        else if (name === "inlineStyle" || name === "_inlineStyle") {
           inlineStyleBabelProperties.push(
             ...attribute.value.expression.properties
           )
