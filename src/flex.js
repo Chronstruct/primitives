@@ -95,6 +95,8 @@ const propMap = {
   overflowY: "overflowY",
   //WebkitOverflowScrolling
   zIndex: "zIndex",
+
+  pointerEvents: "pointerEvents",
 }
 
 const flexPropMap = { ...propMap, direction: "flexDirection" }

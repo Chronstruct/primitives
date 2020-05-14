@@ -33,6 +33,8 @@ var cssPropertyMap = {
   userSelect: "userSelect",
   // ellipsis
   // underline
+
+  pointerEvents: "pointerEvents",
 }
 
 var booleanProps = {

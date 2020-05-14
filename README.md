@@ -66,6 +66,35 @@ Q: Why need a babel transform?
 - needed for prop-based styles
 - essentially enables a layer of known, but dynamic to the static extraction
 
+for example, look at Space's implementation. All of these classnames were created, even if they were never used.:
+
+```jsx
+const SIZE_128_MEDIUM = css`
+  @media ${MEDIUM} {
+    flex-basis: 128px;
+  }
+`
+const SIZE_144_MEDIUM = css`
+  @media ${MEDIUM} {
+    flex-basis: 144px;
+  }
+`
+const sizesMedium = {
+  "0": SIZE_0_MEDIUM,
+  "8": SIZE_8_MEDIUM,
+  "16": SIZE_16_MEDIUM,
+  "24": SIZE_24_MEDIUM,
+  "32": SIZE_32_MEDIUM,
+  "48": SIZE_48_MEDIUM,
+  "64": SIZE_64_MEDIUM,
+  "96": SIZE_96_MEDIUM,
+  "128": SIZE_128_MEDIUM,
+  "144": SIZE_144_MEDIUM,
+}
+```
+
+Using a transform allows for "dynamic, known' values: `size={{_: 16, [MEDIUM]: 128}}`. Only the styles that are used will be created.
+
 ---
 
 When thinking about these components, it is best to picture them in a WYSIWYG editor (like the image at https://github.com/danscan/fractal). What are the essential pieces of this editor, and how would you convert them to code components?
