@@ -46,6 +46,25 @@ module.exports = function (babel) {
             [importSpecifier],
             t.stringLiteral("linaria")
           )
+
+          // (hopefully) temporary workaround to get Linaria to do its thing
+          //- css``
+          path.node.body.unshift(
+            t.taggedTemplateExpression(
+              identifier,
+              t.templateLiteral(
+                [
+                  t.templateElement({
+                    raw: "",
+                    cooked: "",
+                  }),
+                ],
+                []
+              )
+            )
+          )
+
+          // Add the linaria import to the top of the file
           path.node.body.unshift(importDeclaration)
           state.hasAddedImport = true
         },
