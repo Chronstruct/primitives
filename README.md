@@ -1,6 +1,24 @@
 # Primitives
 
-> Semantic primitives for **developers** that improve DX without hurting UX.
+Semantic primitives for **developers** that improve DX without hurting UX.
+
+- Tag names are meaningful for developers
+- Property-based styles reduce developer friction
+- Single-purpose primitives, with a focussed APIs
+- Uncompromising UX
+
+Currently supported primitives:
+
+```jsx
+<box />
+<row />
+<column />
+<flex />
+<space />
+<txt />
+```
+
+## Explanation
 
 [Semantic html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) is necessary for screen readers and SEO, but does little for _human_ code readers (aka developers). These primitives **are** meaningful for developers and help us understand what will be rendered.
 
@@ -34,19 +52,6 @@ const MySection = () => (
     <txt>This text is in a row, so it'll appear right of the heading</txt>
   </row>
 )
-```
-
-Currently supported primitives:
-
-```jsx
-<box />
-<row />
-<column /> /* Note: <col /> is already taken in the DOM */
-<flex />
-
-<space />
-
-<txt /> /* Note: <text /> is already taken in the DOM */
 ```
 
 ## How
@@ -83,7 +88,7 @@ then, `linaria` can work its magic to extract static styles, to become something
 <main className="lgh3ofh" />
 ```
 
-## Why
+## Benefits
 
 #### Tag names are meaningful for developers
 
@@ -119,11 +124,11 @@ then, `linaria` can work its magic to extract static styles, to become something
 </txt>
 ```
 
-Reduces _reading_ friction by being locally reasonable. I don't need to jump anywhere else in the code to understand what this code is. It isn't definied in some styles object above/below the `render()`, and it isn't defined in some external file (like `.css`).
+Reduce _reading_ friction by being locally reasonable. I don't need to jump anywhere else in the code to understand what this code is. It isn't definied in some styles object above/below the `render()`, and it isn't defined in some external file (like `.css`).
 
-Reduces _writing_ friction by avoiding naming completely (Is this thing a "container" or "wrapper"? Is this part of the block (BEM)? Or is it a new block?). This inline approach also enables easier extraction, for when it is time to refactor. Since everything is right here in the render, I can extract it easily. I won't need to remember to move its styles from elsewhere.
+Reduce _writing_ friction by avoiding naming completely (Is this thing a "container" or "wrapper"? Is this part of the block (BEM)? Or is it a new block?). This inline approach also enables easier extraction, for when it is time to refactor. Since everything is right here in the render, I can extract it easily. I won't need to remember to move its styles from elsewhere.
 
-#### Single-purpose primitives, with a focussed API to support their intent
+#### Single-purpose primitives, with a focussed APIs to support their intent
 
 Since a `<div />` can do and be [anything](https://a.singlediv.com/), `<div className="someName" />`, which is really cool, but doesn't help us understand and write maintainable code.
 
