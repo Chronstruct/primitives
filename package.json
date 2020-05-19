@@ -15,6 +15,7 @@
     "src/",
     "loader.js"
   ],
+  "types": "src/index.d.ts",
   "keywords": [
     "chronstruct",
     "babel"

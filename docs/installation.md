@@ -15,3 +15,13 @@ Also, if you'd like to auto-add `import {css} from 'linaria'`, use:
 ```
 
 in `.babelrc`
+
+### Typescript: reference types
+
+Since this is global, and you have no reason to `import {} from chronstruct-primities` in your source code, create a `global.d.ts` file in your project with:
+
+```ts
+/// <reference types="chronstruct-primitives" />
+```
+
+Now, typescript should understand these primitives and not error.

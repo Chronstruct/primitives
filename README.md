@@ -1,4 +1,4 @@
-# Primitives
+# Chronstruct Primitives
 
 Semantic primitives for **developers** that improve DX without hurting UX.
 
@@ -54,7 +54,7 @@ There are a couple cool things about the primitives above that you may have miss
 - there are no imports
 - the tags are lowercase, like a normal browser primitive (e.g. `<div>`, `<span>`, `<p>`)
 
-This is made possible by a `babel-transform` (or a `webpack-loader`), and some added types if you're using Typescript. At compile time, `<insert name>` runs through and converts
+This is made possible by a `babel-transform` (or a `webpack-loader`), and some added types if you're using Typescript. At compile time, `chronstruct-primitives` runs through and converts
 
 ```jsx
 <box
