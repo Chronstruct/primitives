@@ -1,210 +1,177 @@
 # Primitives
 
-css was built for a world of templates and pages, and it works really well in this setting. But today, we're writing and building with components.
+> Semantic primitives for **developers** that improve DX without hurting UX.
 
-In a perfect component-world, everything would by dynamic. Props are variables, after all, and we like to make style and layout adjustments based on these props. Buuut, the web is different from native: users have to "install" our app every visit to see it. CSS is an optimization. It allows us to extract configuration statically, then send it to the client in a more performant way than if it was sent as runtime code.
+[Semantic html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) is necessary for screen readers and SEO, but does little for _human_ code readers (aka developers). These primitives **are** meaningful for developers and help us understand what will be rendered.
 
----
-
-Wild West with its styles and div/spans that can be basically anything. No clear separation of responsibility, with css affecting layout as well as tags (multiple vectors/sources of truth). Good for pages, maybe, and able to get by with conventions like BEM, but feels off in a component world.
-
----
-
-Property-based styles, using single-focussed primitives.
-
----
-
-> Promises were invented, not discovered. The best primitives are discovered, because they are often neutral and we can’t argue against them.
-
-https://staltz.com/promises-are-not-neutral-enough.html
-
----
-
-naming is hard. it slows you down and interrupts your thought processes.
-
-naming should not be done before the implementation. Build the thing, when it seems you should refactor it out, give it the name that it is likely already telling you.
-
----
-
-What is wrong with loops vs functions like map, reduce, filter..?
-Loops don’t give the reader any information about the kind of operation being performed
-
-Same applies to divs vs row, col, flex.
-
---
-
-Makes your react code more declarative.
-
----
-
-Prop can be a value (static or dynamic), or a configuration object
-
----
-
-s2d - Semantic to Developer
-
-essentially, all boils down to div and View, or "something that paints pixels, may position and be positioned, and may react to events".
-
-But if our code was composed entirely of divs (or Views) with many attributes to make img, scrollview, etc, it would be pretty rough to skim through.
-
----
-
-Optimal ux AND dx.
-
-Why does this exist?
-
-- to reduce developer friction, and not compromise on UX
-- less naming
-- seperation of concerns
-- static css sent as css (better perf for user)
-
-A set of primitives focussed on DX, without sacrificing UX
-
-Q: Why need a babel transform?
-
-- originally for perf (see playbook's reconciler)
-- needed for prop-based styles
-- essentially enables a layer of known, but dynamic to the static extraction
-
-for example, look at Space's implementation. All of these classnames were created, even if they were never used.:
+Replace unknown and assumption-based primitives:
 
 ```jsx
-const SIZE_128_MEDIUM = css`
-  @media ${MEDIUM} {
-    flex-basis: 128px;
-  }
-`
-const SIZE_144_MEDIUM = css`
-  @media ${MEDIUM} {
-    flex-basis: 144px;
-  }
-`
-const sizesMedium = {
-  "0": SIZE_0_MEDIUM,
-  "8": SIZE_8_MEDIUM,
-  "16": SIZE_16_MEDIUM,
-  "24": SIZE_24_MEDIUM,
-  "32": SIZE_32_MEDIUM,
-  "48": SIZE_48_MEDIUM,
-  "64": SIZE_64_MEDIUM,
-  "96": SIZE_96_MEDIUM,
-  "128": SIZE_128_MEDIUM,
-  "144": SIZE_144_MEDIUM,
-}
+const MySection = () => (
+  <section className="unknown">
+    <h1 className="assumption">You think you know, but you have no idea</h1>
+    <span>Where will this text go?<span>
+  </section>
+)
 ```
 
-Using a transform allows for "dynamic, known' values: `size={{_: 16, [MEDIUM]: 128}}`. Only the styles that are used will be created.
-
----
-
-When thinking about these components, it is best to picture them in a WYSIWYG editor (like the image at https://github.com/danscan/fractal). What are the essential pieces of this editor, and how would you convert them to code components?
-
-- `View`, `ScrollView`, `Space`, `Text`, `Image`, and `Video` would exist on the left side as your palette
-- `Style_`, `Event_`, `Animate_` would exist as tabs on the right side for editing properties of the palette components
-- Future `Layer` would exist to coordinate `z-index`
-- Future `Timeline` would exist to time/choreograph events
-
----
-
-## What?
-
-Styles-as-props primitives to reduce developer friction without compromising UX.
-
-s2d without sacrificing UX. Fixes the style problem. css is a really good thing, it is sent to the client as a separate type from js, and doesn't pay the js tax when the client interprets it.
-
-Custom semantic primitives for **developers**:
-
-- `<view />`
-- `<flex />`
-- `<row />`
-- `<column />`
-- `<space />`
-- `<txt />`
-
-## Why?
-
-_Seminatic_ html is great for users, screen readers, and SEO. It better describes the intent and type of a tag. These primitives are _semantic_ for us **developers**.
+With locally reasonable, descriptive ones:
 
 ```jsx
-<col
-  as='main"'
-  height={200}
-  width={400}
->
-  <view
-    as="section"
-    grow
-    style={{
-      backgroundColor: "red",
-    }}
-  />
+const MySection = () => (
+  <row
+    tag="section"
+    justify="space-between"
+  >
+    <txt
+      tag="h1"
+      size={10}
+      font="Comic Sans"
+      color="blue"
+    >
+      You think you know, and you're right!
+    </txt>
+    <txt>This text is in a row, so it'll appear right of the heading</txt>
+  </row>
+)
+```
 
-  <row as="section">
-    <view
-      padding={20}
-      marginTop={10}
-      zIndex={100}
-    />
-    <view
-      width="20%"
-      minWidth={200}
-    />
+Currently supported primitives:
+
+```jsx
+<box />
+<row />
+<column /> /* Note: <col /> is already taken in the DOM */
+<flex />
+
+<space />
+
+<txt /> /* Note: <text /> is already taken in the DOM */
+```
+
+## How
+
+There are a couple cool things about the primitives above that you may have not noticed:
+
+- there are no imports
+- the tags are lowercase, like a normal browser primitive (e.g. `<div>`, `<span>`, `<p>`)
+
+This is made possible by a `babel-transform` (or a `webpack-loader`), and some added types if you're using Typescript. At compile time, `<insert name>` runs through and converts
+
+```jsx
+<box
+  tag="main"
+  height={20}
+  width={300}
+/>
+```
+
+into
+
+```jsx
+<main
+  className={css`
+    height: 20;
+    width: 300;
+  `}
+/>
+```
+
+then, `linaria` can work its magic to extract static styles, to become something like
+
+```jsx
+<main className="lgh3ofh" />
+```
+
+## Why
+
+#### Tag names are meaningful for developers
+
+```jsx
+<column>
+  <row>
+    <SomeComponent />
+    <AnotherComponent />
   </row>
 
-  <space size={20} />
-  <view
-    as="footer"
-    style={{
-      backgroundColor: "blue",
-    }}
-  />
-</col>
+  <space size={32} />
+
+  <txt>Some text</txt>
+</column>
 ```
 
-- See that `<col>` tag? That means you should read it's children top-down.
-- See that `<row>` tag? That means you should instead read it left-right.
+- See that `<column>` tag? That means you should read it's children top-down.
+- See that `<row>` tag? That means you should read left-right.
 - See that `<space/>` tag? It is only there to take up space.
 
-Of course, there are more benefits than just being semantic to developers, these primitives also give us streamlined APIS for dealing with `text`, `image`s, etc. And all of this is done in your `.js`, on the specific component as first-class `props`.
+#### Property-based styles reduce developer friction
 
-One last benefit to mention: _separation of concerns_. Layout components expose geometry-related styles as props. All cosmetic styles are added with the `styles` prop. These are all extracted out to static `.css` and auto-imported using [linaria](https://github.com/callstack/linaria). For dynamic styles, simply use `inlineStyles`.
-
-## Getting started
-
-`yarn add chronstruct-primitives`
-
-Usage note: Requires [babel\-plugin\-object\-styles\-to\-template](https://github.com/satya164/babel-plugin-object-styles-to-template) and [linaria](https://github.com/callstack/linaria). See [starter](https://github.com/Chronstruct/static-starter/blob/master/.babelrc) for an example.
-
-Also, if you'd like to auto-add `import {css} from 'linaria'`, use:
-
-```js
-["chronstruct-primitives", {
-    "autoImport": true
-}],
+```jsx
+<txt
+  tag="h1"
+  font="cursive"
+  size={36}
+  height={40}
+  spacing={0.2}
+  color="red"
+>
+  A Heading
+</txt>
 ```
 
-in `.babelrc` and use [this]() linaria fork.
+Reduces _reading_ friction by being locally reasonable. I don't need to jump anywhere else in the code to understand what this code is. It isn't definied in some styles object above/below the `render()`, and it isn't defined in some external file (like `.css`).
 
-# Dev Notes
+Reduces _writing_ friction by avoiding naming completely (Is this thing a "container" or "wrapper"? Is this part of the block (BEM)? Or is it a new block?). This inline approach also enables easier extraction, for when it is time to refactor. Since everything is right here in the render, I can extract it easily. I won't need to remember to move its styles from elsewhere.
 
-### Testing
+#### Single-purpose primitives, with a focussed API to support their intent
 
-To run a single test, use `yarn test -t 'test name'`. e.g. `run test -t "chronstruct-primitives fixtures"` to run all babel-plugin-tester fixtures.
+Since a `<div />` can do and be [anything](https://a.singlediv.com/), `<div className="someName" />`, which is really cool, but doesn't help us understand and write maintainable code.
 
-### Publish
+`<txt />`, on the other hand, has first-class props (`size`, `height`, `color`, `font`, `spacing`) that ONLY relate to what it cares about: text. If you want to add non-text-related effects to it, like a background color, or click event, you'll have to use a second-class prop (`_style={{background: 'red}}`).
 
-`npm publish`. If errors with "You must be logged in to publish packages", then `npm login`.
+`<row />`, `<column />`, and `<flex />` are similar in that they only care about geometry/layout (for themselves and their children).
 
-### Other
+#### Uncompromising UX
 
-- [Babel types · Babel](https://babeljs.io/docs/core-packages/babel-types)
-- [AST explorer](https://astexplorer.net/)
-- [babel\-plugin\-object\-styles\-to\-template/index\.js at master · satya164/babel\-plugin\-object\-styles\-to\-template](https://github.com/satya164/babel-plugin-object-styles-to-template/blob/master/index.js)
-- [babel\-literal\-to\-ast/index\.js at master · izaakschroeder/babel\-literal\-to\-ast](https://github.com/izaakschroeder/babel-literal-to-ast/blob/master/src/index.js)
+These primtives were built with [linaria](https://github.com/callstack/linaria) in mind. With linaria, all static styles are extracted out to `.css`, which results in a faster [TTI](https://web.dev/interactive/) than if the styles were sent in the javascript (what runtime css-in-js solutions do).
+
+```jsx
+<box
+  height={20}
+  width={40}
+  _style={{ background: "red" }}
+/>
+
+// becomes
+<div className="..." />
+```
+
+Dynamic styles are still supported, though. When a variable is used for a value, it is added to the element's inline style.
+
+```jsx
+<box
+  height={20}
+  width={40}
+  _style={{ background: props.color }}
+/>
+
+// becomes
+<div
+ className="..."
+ style={{background: props.color}}
+/>
+```
+
+In the future, the linaria dependence may be configured to use other libs.
+
+## Docs (not yet available)
+
+- Installation (not yet available)
+- API (not yet available)
 
 ## Inspirations
 
-- [constelation/monorepo: Mono repo for constelation's Components, functions, and CONSTANTS](https://github.com/constelation/monorepo)
-- [jxnblk/rebass: Functional React UI component library, built with styled\-components](https://github.com/jxnblk/rebass)
-- [jxnblk/styled\-system: Design system utilities for styled\-components and other css\-in\-js libraries](https://github.com/jxnblk/styled-system)
-- [mrmartineau/design\-system\-utils: Design system framework for modern front\-end projects](https://github.com/mrmartineau/design-system-utils)
+- [constelation/monorepo](https://github.com/constelation/monorepo)
+- [jxnblk/rebass](https://github.com/jxnblk/rebass)
+- [jxnblk/styled\-system](https://github.com/jxnblk/styled-system)
+- [mrmartineau/design\-system\-utils](https://github.com/mrmartineau/design-system-utils)

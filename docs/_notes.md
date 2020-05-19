@@ -1,6 +1,247 @@
 # Random notes
 
-These were once github Issues, now I'm pasting them here
+## For a presentation
+
+```jsx
+<div className="container">
+  <nav className="navbar">
+    <Link />
+    <Link />
+  </nav>
+
+  <main className="main">
+    <h1 className="section__heading">A Heading</h1>
+    <p className="section__copy">Some body of text</p>
+  </main>
+</div>
+```
+
+Ask audience what they expect the web app to look like. Surprise them with a vertical navbar on the left side. Container is a flex-box row.
+
+```jsx
+<column>
+  <row
+    tag="nav"
+    height={80}
+    align="center"
+  >
+    <Link />
+    <Link />
+  </row>
+
+  <column
+    tag="main"
+    center
+  >
+    <txt
+      tag="h1"
+      font="cursive"
+      size={36}
+      height={40}
+      spacing={0.2}
+      color="red"
+    >
+      A Heading
+    </txt>
+    <txt tag="p">Some body of text</txt>
+  </column>
+</column>
+```
+
+What if nav should be on top for phone? Introduce configuration objects for responsive styles.
+
+`<flex direction={{ _: "column", MEDIUM_UP: "row" }}>`
+
+```jsx
+<txt
+  tag="h1"
+  font="cursive"
+  size={36}
+  height={40}
+  spacing={0.2}
+  color="red"
+>
+  A Heading
+</txt>
+```
+
+As a developer, friction in reading or writing code is just about the worst. It is like playing a video game with a laggy internet connection, or talking to someone over a spotty connection. These property-based styles reduce friction in two ways:
+
+##### Writing: No Naming
+
+##### Reading: Locally reasoned
+
+---
+
+How do you know it isn't adding to the runtime cost? `yarn add -D`. That `-D` is excellent!
+
+## For the readme
+
+rapid-prototype production-ready code
+
+---
+
+css was built for a world of templates and pages, and it works really well in this setting. But today, we're writing and building with components.
+
+In a perfect component-world, everything would by dynamic. Props are variables, after all, and we like to make style and layout adjustments based on these props. Buuut, the web is different from native: users have to "install" our app every visit to see it. CSS is an optimization. It allows us to extract configuration statically, then send it to the client in a more performant way than if it was sent as runtime code.
+
+---
+
+Wild West with its styles and div/spans that can be basically anything. No clear separation of responsibility, with css affecting layout as well as tags (multiple vectors/sources of truth). Good for pages, maybe, and able to get by with conventions like BEM, but feels off in a component world.
+
+---
+
+Property-based styles, using single-focussed primitives.
+
+---
+
+> Promises were invented, not discovered. The best primitives are discovered, because they are often neutral and we can’t argue against them.
+
+https://staltz.com/promises-are-not-neutral-enough.html
+
+---
+
+naming is hard. it slows you down and interrupts your thought processes.
+
+naming should not be done before the implementation. Build the thing, when it seems you should refactor it out, give it the name that it is likely already telling you.
+
+---
+
+What is wrong with loops vs functions like map, reduce, filter..?
+Loops don’t give the reader any information about the kind of operation being performed
+
+Same applies to divs vs row, col, flex.
+
+--
+
+Makes your react code more declarative.
+
+---
+
+Prop can be a value (static or dynamic), or a configuration object
+
+---
+
+s2d - Semantic to Developer
+
+essentially, all boils down to div and View, or "something that paints pixels, may position and be positioned, and may react to events".
+
+But if our code was composed entirely of divs (or Views) with many attributes to make img, scrollview, etc, it would be pretty rough to skim through.
+
+---
+
+Optimal ux AND dx.
+
+Why does this exist?
+
+- to reduce developer friction, and not compromise on UX
+- less naming
+- seperation of concerns
+- static css sent as css (better perf for user)
+
+A set of primitives focussed on DX, without sacrificing UX
+
+Q: Why need a babel transform?
+
+- originally for perf (see playbook's reconciler)
+- needed for prop-based styles
+- essentially enables a layer of known, but dynamic to the static extraction
+
+for example, look at Space's implementation. All of these classnames were created, even if they were never used.:
+
+```jsx
+const SIZE_128_MEDIUM = css`
+  @media ${MEDIUM} {
+    flex-basis: 128px;
+  }
+`
+const SIZE_144_MEDIUM = css`
+  @media ${MEDIUM} {
+    flex-basis: 144px;
+  }
+`
+const sizesMedium = {
+  "0": SIZE_0_MEDIUM,
+  "8": SIZE_8_MEDIUM,
+  "16": SIZE_16_MEDIUM,
+  "24": SIZE_24_MEDIUM,
+  "32": SIZE_32_MEDIUM,
+  "48": SIZE_48_MEDIUM,
+  "64": SIZE_64_MEDIUM,
+  "96": SIZE_96_MEDIUM,
+  "128": SIZE_128_MEDIUM,
+  "144": SIZE_144_MEDIUM,
+}
+```
+
+Using a transform allows for "dynamic, known' values: `size={{_: 16, [MEDIUM]: 128}}`. Only the styles that are used will be created.
+
+---
+
+When thinking about these components, it is best to picture them in a WYSIWYG editor (like the image at https://github.com/danscan/fractal). What are the essential pieces of this editor, and how would you convert them to code components?
+
+- `View`, `ScrollView`, `Space`, `Text`, `Image`, and `Video` would exist on the left side as your palette
+- `Style_`, `Event_`, `Animate_` would exist as tabs on the right side for editing properties of the palette components
+- Future `Layer` would exist to coordinate `z-index`
+- Future `Timeline` would exist to time/choreograph events
+
+---
+
+Styles-as-props primitives to reduce developer friction without compromising UX.
+
+s2d without sacrificing UX. Fixes the style problem. css is a really good thing, it is sent to the client as a separate type from js, and doesn't pay the js tax when the client interprets it.
+
+---
+
+These primitives have _meaining_
+
+_Semantic html_ is necessary for users of screen readers and your SEO. They're important for
+
+It better describes the intent and type of a tag. These primitives are _semantic_ for us **developers** (and still render as sematic html).
+
+```jsx
+<col
+  as='main"'
+  height={200}
+  width={400}
+>
+  <view
+    as="section"
+    grow
+    style={{
+      backgroundColor: "red",
+    }}
+  />
+
+  <row as="section">
+    <view
+      padding={20}
+      marginTop={10}
+      zIndex={100}
+    />
+    <view
+      width="20%"
+      minWidth={200}
+    />
+  </row>
+
+  <space size={20} />
+  <view
+    as="footer"
+    style={{
+      backgroundColor: "blue",
+    }}
+  />
+</col>
+```
+
+- See that `<col>` tag? That means you should read it's children top-down.
+- See that `<row>` tag? That means you should instead read it left-right.
+- See that `<space/>` tag? It is only there to take up space.
+
+Of course, there are more benefits than just being semantic to developers, these primitives also give us streamlined APIS for dealing with `text`, `image`s, etc. And all of this is done in your `.js`, on the specific component as first-class `props`.
+
+One last benefit to mention: _separation of concerns_. Layout components expose geometry-related styles as props. All cosmetic styles are added with the `styles` prop. These are all extracted out to static `.css` and auto-imported using [linaria](https://github.com/callstack/linaria). For dynamic styles, simply use `inlineStyles`.
 
 ## [2 approaches to separating concerns](https://github.com/Chronstruct/primitives/issues/8)
 
