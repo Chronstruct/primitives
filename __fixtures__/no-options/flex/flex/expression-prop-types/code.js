@@ -1,0 +1,9 @@
+<flex
+  width={'20px'}
+  height={20}
+  padding={"20px"}
+  margin={'20px'}
+  zIndex={10}
+  shrink={1}
+  grow={true}
+ />

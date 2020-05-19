@@ -1,59 +1,130 @@
-'use strict';
+"use strict"
 
 // var printAST = require('ast-pretty-print')
-var t = require('babel-types');
-var Utils = require('./utils');
+var t = require("@babel/types")
+var Utils = require("./utils")
 var renameTag = Utils.renameTag,
-    addCssProperty = Utils.addCssProperty,
-    buildClassNamePropFunction = Utils.buildClassNamePropFunction;
+  tagPrefixRegex = Utils.tagPrefixRegex,
+  addBooleanProperty = Utils.addBooleanProperty,
+  addCssProperty = Utils.addCssProperty,
+  buildClassNamePropFunction = Utils.buildClassNamePropFunction,
+  buildStyleProp = Utils.buildStyleProp
 
 var propsToOmit = {
-  as: true,
+  tag: true,
 }
 
 var cssProps = {
-  size: 'flexBasis',
+  size: "flexBasis",
 }
 
-var defaultCss = {flexGrow: t.numericLiteral(0), flexShrink: t.numericLiteral(0)}
+var booleanProps = {
+  grow: "flexGrow",
+  shrink: "flexShrink",
+}
 
-module.exports = function(node) {
+var defaultCss = {
+  flexGrow: t.numericLiteral(0),
+  flexShrink: t.numericLiteral(0),
+}
+
+module.exports = function (node) {
   function buildProps(node) {
-      var cssProperties = Object.assign({}, defaultCss)
+    var staticStyle = Object.assign({}, defaultCss)
+    var dynamicStyle = {}
+    var inlineStyleBabelProperties = []
+    var props = []
 
-      var props = []
+    let otherClassNames
 
     if (node.openingElement.attributes != null) {
-        node.openingElement.attributes.forEach(attribute => {
-            var name = attribute.name.name
+      node.openingElement.attributes.forEach((attribute) => {
+        var name = attribute.name.name
 
-            if (name in propsToOmit) {
-                return
-            }
-            else if (name === 'style') {
-                attribute.value.expression.properties.forEach(property => {
-                    addCssProperty(cssProperties, property.key.name, property.value, cssProps)
-                })
-            }
-            else if (name in cssProps) {
-                addCssProperty(cssProperties, cssProps[name], attribute.value, cssProps)
-            }
-            else {
-                props.push(attribute)
-            }
-        })
+        if (name in propsToOmit) {
+          return
+        }
+        else if (name === "style" || name === "_style") {
+          attribute.value.expression.properties.forEach((property) => {
+            addCssProperty(
+              staticStyle,
+              dynamicStyle,
+              property.key.name,
+              property.value,
+              cssProps
+            )
+          })
+        }
+        else if (name === "inlineStyle" || name === "_inlineStyle") {
+          inlineStyleBabelProperties.push(
+            ...attribute.value.expression.properties
+          )
+        }
+        else if (name in cssProps) {
+          addCssProperty(
+            staticStyle,
+            dynamicStyle,
+            cssProps[name],
+            attribute.value
+          )
+        }
+        else if (name in booleanProps) {
+          addBooleanProperty(
+            staticStyle,
+            dynamicStyle,
+            attribute,
+            booleanProps[name],
+            {
+              true: t.numericLiteral(1),
+              false: t.numericLiteral(0),
+            },
+            { allowNumber: true }
+          )
+        }
+        else if (tagPrefixRegex.test(name)) {
+          attribute.name.name = name.replace(tagPrefixRegex, "")
+          props.push(attribute)
+        }
+        else if (name === "className") {
+          if (t.isJSXExpressionContainer(attribute.value)) {
+            otherClassNames = attribute.value.expression
+          }
+          else if (t.isStringLiteral(attribute.value)) {
+            otherClassNames = attribute.value
+          }
+
+          // Note: skip adding to props
+        }
+        else {
+          props.push(attribute)
+        }
+      })
     }
 
-      var className = buildClassNamePropFunction(t, cssProperties, cssProps)
+    var classNameProp = buildClassNamePropFunction(
+      t,
+      staticStyle,
+      cssProps,
+      otherClassNames
+    )
+    classNameProp.value.expression.loc = node.loc
+    props.push(classNameProp)
 
-      //console.log(className)
-      className.value.expression.loc = node.loc
+    // Add inline styles prop if there are styles to add
+    if (
+      Object.keys(dynamicStyle).length > 0 ||
+      inlineStyleBabelProperties.length > 0
+    ) {
+      var styleProp = buildStyleProp(
+        t,
+        dynamicStyle,
+        inlineStyleBabelProperties
+      )
+      styleProp.value.expression.loc = node.loc
+      props.push(styleProp)
+    }
 
-      //var cssProperties = className.value.expression.arguments[0].properties
-
-      props.push(className)
-
-      return props
+    return props
   }
 
   /*

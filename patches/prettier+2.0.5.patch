@@ -1,0 +1,72 @@
+diff --git a/node_modules/prettier/bin-prettier.js b/node_modules/prettier/bin-prettier.js
+index 6acda2d..4f86b5b 100755
+--- a/node_modules/prettier/bin-prettier.js
++++ b/node_modules/prettier/bin-prettier.js
+@@ -40130,7 +40130,7 @@ function printPathNoParens(path, options, print, args) {
+ 
+         if (n.alternate) {
+           const commentOnOwnLine = hasTrailingComment$1(n.consequent) && n.consequent.comments.some(comment => comment.trailing && !comments$1.isBlockComment(comment)) || needsHardlineAfterDanglingComment$1(n);
+-          const elseOnSameLine = n.consequent.type === "BlockStatement" && !commentOnOwnLine;
++          const elseOnSameLine = false
+           parts.push(elseOnSameLine ? " " : hardline$4);
+ 
+           if (hasDanglingComments$1(n)) {
+@@ -40372,8 +40372,9 @@ function printPathNoParens(path, options, print, args) {
+         !nameHasComments || n.attributes.length) && !lastAttrHasTrailingComments; // We should print the opening element expanded if any prop value is a
+         // string literal with newlines
+ 
++        const separator = n.attributes.length > 1 ? hardline$4 : line$4;
+         const shouldBreak = n.attributes && n.attributes.some(attr => attr.value && isStringLiteral$1(attr.value) && attr.value.value.includes("\n"));
+-        return group$2(concat$6(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$6([indent$3(concat$6(path.map(attr => concat$6([line$4, print(attr)]), "attributes"))), n.selfClosing ? line$4 : bracketSameLine ? ">" : softline$2]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
++        return group$2(concat$6(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$6([indent$3(concat$6(path.map(attr => concat$6([separator, print(attr)]), "attributes"))), n.selfClosing ? line$4 : bracketSameLine ? ">" : softline$2]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
+           shouldBreak
+         });
+       }
+diff --git a/node_modules/prettier/index.js b/node_modules/prettier/index.js
+index 0043381..a2c966c 100755
+--- a/node_modules/prettier/index.js
++++ b/node_modules/prettier/index.js
+@@ -40088,7 +40088,7 @@ function printPathNoParens(path, options, print, args) {
+ 
+         if (n.alternate) {
+           const commentOnOwnLine = hasTrailingComment$1(n.consequent) && n.consequent.comments.some(comment => comment.trailing && !comments$1.isBlockComment(comment)) || needsHardlineAfterDanglingComment$1(n);
+-          const elseOnSameLine = n.consequent.type === "BlockStatement" && !commentOnOwnLine;
++          const elseOnSameLine = false
+           parts.push(elseOnSameLine ? " " : hardline$4);
+ 
+           if (hasDanglingComments$1(n)) {
+@@ -40330,8 +40330,9 @@ function printPathNoParens(path, options, print, args) {
+         !nameHasComments || n.attributes.length) && !lastAttrHasTrailingComments; // We should print the opening element expanded if any prop value is a
+         // string literal with newlines
+ 
++        const separator = n.attributes.length > 1 ? hardline$4 : line$4;
+         const shouldBreak = n.attributes && n.attributes.some(attr => attr.value && isStringLiteral$1(attr.value) && attr.value.value.includes("\n"));
+-        return group$2(concat$6(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$6([indent$3(concat$6(path.map(attr => concat$6([line$4, print(attr)]), "attributes"))), n.selfClosing ? line$4 : bracketSameLine ? ">" : softline$2]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
++        return group$2(concat$6(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$6([indent$3(concat$6(path.map(attr => concat$6([separator, print(attr)]), "attributes"))), n.selfClosing ? line$4 : bracketSameLine ? ">" : softline$2]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
+           shouldBreak
+         });
+       }
+diff --git a/node_modules/prettier/standalone.js b/node_modules/prettier/standalone.js
+index a94c2e2..c00eee5 100755
+--- a/node_modules/prettier/standalone.js
++++ b/node_modules/prettier/standalone.js
+@@ -27254,7 +27254,7 @@
+ 
+           if (n.alternate) {
+             const commentOnOwnLine = hasTrailingComment$1(n.consequent) && n.consequent.comments.some(comment => comment.trailing && !comments$1.isBlockComment(comment)) || needsHardlineAfterDanglingComment$1(n);
+-            const elseOnSameLine = n.consequent.type === "BlockStatement" && !commentOnOwnLine;
++            const elseOnSameLine = false
+             parts.push(elseOnSameLine ? " " : hardline$9);
+ 
+             if (hasDanglingComments$1(n)) {
+@@ -27496,8 +27496,9 @@
+           !nameHasComments || n.attributes.length) && !lastAttrHasTrailingComments; // We should print the opening element expanded if any prop value is a
+           // string literal with newlines
+ 
++          const separator = n.attributes.length > 1 ? hardline$4 : line$4;
+           const shouldBreak = n.attributes && n.attributes.some(attr => attr.value && isStringLiteral$1(attr.value) && attr.value.value.includes("\n"));
+-          return group$b(concat$d(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$d([indent$7(concat$d(path.map(attr => concat$d([line$9, print(attr)]), "attributes"))), n.selfClosing ? line$9 : bracketSameLine ? ">" : softline$6]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
++          return group$2(concat$6(["<", path.call(print, "name"), path.call(print, "typeParameters"), concat$6([indent$3(concat$6(path.map(attr => concat$6([separator, print(attr)]), "attributes"))), n.selfClosing ? line$4 : bracketSameLine ? ">" : softline$2]), n.selfClosing ? "/>" : bracketSameLine ? "" : ">"]), {
+             shouldBreak
+           });
+         }

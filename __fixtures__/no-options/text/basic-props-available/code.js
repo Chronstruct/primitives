@@ -1,0 +1,9 @@
+<text
+  font='Arial'
+  color='red'
+  size={"20px"}
+  spacing={'20px'}
+  decoration={'underline'}
+  weight={100}
+  transform={'capitalize'}
+/>

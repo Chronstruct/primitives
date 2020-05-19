@@ -1,4 +1,4 @@
-import {css} from 'linaria'
+import {css} from "linaria"
 
 const something = () => (
 <view />

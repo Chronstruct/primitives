@@ -1,0 +1,12 @@
+<div className={css`
+  display: flex;
+  align-content: flex-start;
+  position: relative;
+  flex-shrink: 1;
+  width: 20px;
+  height: 20px;
+  padding: 20px;
+  margin: 20px;
+  z-index: 10;
+  flex-grow: 1;
+`} />;

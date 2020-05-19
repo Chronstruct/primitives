@@ -1,0 +1,9 @@
+<span className={css`
+  font-family: Arial;
+  color: red;
+  font-size: 20px;
+  letter-spacing: 20px;
+  text-decoration: underline;
+  font-weight: 100;
+  text-transform: capitalize;
+`} />;
