@@ -2,21 +2,14 @@
 
 Semantic primitives for **developers** that improve DX without hurting UX.
 
-- Tag names are meaningful for developers
-- Property-based styles reduce developer friction
-- Single-purpose primitives, with a focussed APIs
-- Uncompromising UX
+- **Meaningful** tag names for humans
+- **Property-based** styles reduce developer friction
+- **Single-purpose** primitives, with focussed APIs
+- **Uncompromising** user experience
 
-Currently supported primitives:
+Currently supported primitives: `box`, `row`, `column`, `flex`, `space`, `txt`
 
-```jsx
-<box />
-<row />
-<column />
-<flex />
-<space />
-<txt />
-```
+[Installation](docs/installation.md) | Guides | [API](docs/api.md) | FAQ
 
 ## Explanation
 
@@ -168,11 +161,6 @@ Dynamic styles are still supported, though. When a variable is used for a value,
 ```
 
 In the future, the linaria dependence may be configured to use other libs.
-
-## Docs (not yet available)
-
-- Installation (not yet available)
-- API (not yet available)
 
 ## Inspirations
 
