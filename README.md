@@ -2,10 +2,10 @@
 
 Semantic primitives for **developers** that improve DX without hurting UX.
 
-- Meaningful tag names for humans
-- Property-based styles reduce developer friction
-- Single-purpose primitives, with focussed APIs
-- Uncompromising user experience
+- Meaningful tag names
+- Property-based styles that reduce developer friction
+- Single-purpose primitives with focussed APIs
+- Uncompromised user experience
 
 Currently supported primitives: `box`, `row`, `column`, `flex`, `space`, `txt`
 
@@ -13,7 +13,7 @@ Currently supported primitives: `box`, `row`, `column`, `flex`, `space`, `txt`
 
 ## Explanation
 
-[Semantic html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) is necessary for screen readers and SEO, but does little for _human_ code readers (aka developers). These primitives **are** meaningful for developers and help us understand what will be rendered.
+[Semantic HTML](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) is necessary for screen readers and SEO, but does little for _human_ code readers (aka developers). These primitives **are** meaningful for developers and help us understand what will be rendered.
 
 Replace unknown and assumption-based primitives:
 
@@ -75,7 +75,7 @@ into
 />
 ```
 
-then, [linaria](https://github.com/callstack/linaria) can work its magic to extract static styles, to become something like
+then, [linaria](https://github.com/callstack/linaria) can work its magic to extract static styles, to become
 
 ```jsx
 <main className="..." />
@@ -83,7 +83,7 @@ then, [linaria](https://github.com/callstack/linaria) can work its magic to extr
 
 ## Benefits
 
-#### Tag names are meaningful for developers
+### Tag names are meaningful for developers
 
 ```jsx
 <column>
@@ -102,7 +102,7 @@ then, [linaria](https://github.com/callstack/linaria) can work its magic to extr
 - See that `<row>` tag? That means you should read left-right.
 - See that `<space/>` tag? It is only there to take up space.
 
-#### Property-based styles reduce developer friction
+### Property-based styles reduce developer friction
 
 ```jsx
 <txt
@@ -121,7 +121,7 @@ Reduce **reading friction** by being locally reasonable. I don't need to jump an
 
 Reduce **writing friction** by avoiding naming completely (Is this thing a "container" or "wrapper"? Is this part of the block (BEM)? Or is it a new block?). This inline approach also enables easier extraction, for when it is time to refactor. Since everything is right here in the render, I can extract it easily. I won't need to remember to move its styles from elsewhere.
 
-#### Single-purpose primitives, with a focussed APIs to support their intent
+### Single-purpose primitives, with a focussed APIs to support their intent
 
 A `<div />` can do and be [anything](https://a.singlediv.com/), `<div className="someName" />`, which is really cool, but doesn't help us understand or write maintainable code.
 
@@ -129,7 +129,7 @@ A `<div />` can do and be [anything](https://a.singlediv.com/), `<div className=
 
 `<row />`, `<column />`, and `<flex />` are similar in that they only care about geometry/layout (for themselves and their children).
 
-#### Uncompromising UX
+### Uncompromising UX
 
 These primtives were built with [linaria](https://github.com/callstack/linaria) in mind. With linaria, all static styles are extracted out to `.css`, which results in a faster [TTI](https://web.dev/interactive/) than if the styles were sent in javascript (what runtime css-in-js solutions do).
 
@@ -160,7 +160,7 @@ Dynamic styles are still supported, though. When a variable is used for a value,
 />
 ```
 
-In the future, the linaria dependence may be configured to use other libs.
+In the future, to use other libs, the linaria dependence may be made configurable.
 
 ## Inspirations
 
