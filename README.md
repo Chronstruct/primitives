@@ -123,9 +123,29 @@ Reduce **writing friction** by avoiding naming completely (Is this thing a "cont
 
 ### Single-purpose primitives, with a focussed APIs to support their intent
 
-A `<div />` can do and be [anything](https://a.singlediv.com/), `<div className="someName" />`, which is really cool, but doesn't help us understand or write maintainable code.
+A `<div />` can do and be [anything](https://a.singlediv.com/), which is really cool, but doesn't help us understand or write maintainable code.
 
-`<txt />`, on the other hand, has first-class props (`size`, `height`, `color`, `font`, `spacing`) that ONLY relate to what it cares about: text. If you want to add non-text-related effects to it, like a background color, or click event, you'll have to use a second-class prop (`_style={{background: 'red}}`).
+```jsx
+<div className="anything you can imagine" />
+```
+
+`<txt />`, on the other hand, has first-class props (`size`, `height`, `color`, `font`, `spacing`) that ONLY relate to what it cares about: text. If you want to add non-text-related effects to it, like a background color, or click event, you'll have to use a second-class prop.
+
+```jsx
+<txt
+  // first-class props
+  size={36}
+  height={40}
+  spacing={0.2}
+  color="red"
+  // second-class props are prefixed with an _
+  _style={{
+    background: "red",
+  }}
+>
+  I care about text!
+</txt>
+```
 
 `<row />`, `<column />`, and `<flex />` are similar in that they only care about geometry/layout (for themselves and their children).
 
