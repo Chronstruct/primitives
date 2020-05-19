@@ -168,3 +168,11 @@ In the future, the linaria dependence may be configured to use other libs.
 - [jxnblk/rebass](https://github.com/jxnblk/rebass)
 - [jxnblk/styled\-system](https://github.com/jxnblk/styled-system)
 - [mrmartineau/design\-system\-utils](https://github.com/mrmartineau/design-system-utils)
+
+## License
+
+This project is licensed under the [MIT license](LICENSE).
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion by you, shall be licensed as MIT, without any additional terms or conditions.
