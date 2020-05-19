@@ -1,7 +1,7 @@
 {
   "name": "chronstruct-primitives",
-  "version": "0.2.0",
-  "description": "",
+  "version": "0.3.0",
+  "description": "Semantic primitives for developers that improve DX without hurting UX.",
   "homepage": "https://github.com/chronstruct/primitives",
   "main": "src/index.js",
   "scripts": {
@@ -18,10 +18,11 @@
   "types": "src/index.d.ts",
   "keywords": [
     "chronstruct",
+    "primitives",
     "babel"
   ],
-  "author": "Kyle Poole <2kylepoole@gmail.com> (http://kylpo.com/)",
-  "license": "ISC",
+  "author": "Kyle Poole <kyle@chronstruct.com> (http://kylpo.com/)",
+  "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
