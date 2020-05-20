@@ -184,6 +184,7 @@ In the future, to use other libs, the linaria dependence may be made configurabl
 
 ## Inspirations
 
+- [kylpo/kylpo\-monorepo](https://github.com/kylpo/kylpo-monorepo)
 - [constelation/monorepo](https://github.com/constelation/monorepo)
 - [jxnblk/rebass](https://github.com/jxnblk/rebass)
 - [jxnblk/styled\-system](https://github.com/jxnblk/styled-system)
