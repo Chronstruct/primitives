@@ -1,6 +1,67 @@
 # Random notes
 
+"Meaningful primitives for developers that improve DX without sacrificing UX"
+
+"Developer-first primitives that don't sacrifice UX"
+
+- Meaning of "developer-first": writing, reading, updating experience -> speed, flow, joy
+
+---
+
+Stop using divs and spans.
+
+Replace your divs and spans with meaningful rows, cols, and boxes
+
+---
+
+I would like to say that tag= is like an aria=, but there's a bit more to it, since certain tags have more than just screen-reading meaning, like <a> tags and the href= attribute.
+
+---
+
+Layout primitives care about their own geometry and positioning their children
+
+---
+
+## On Atomic-ish CSS
+
+Using Linaria's hash-based naming (not scoped to each component).
+
+> We addressed this by generating atomic CSS at build time. Atomic CSS has a logarithmic growth curve because it’s proportional to the number of unique style declarations rather than to the number of styles and features we write. This lets us combine the generated atomic CSS from across our site into a single, small, shared stylesheet. As a result, the new homepage downloads less than 20 percent of the CSS the old site downloaded.
+>
+> [Rebuilding our tech stack for a new Facebook\.com \- Facebook Engineering](https://engineering.fb.com/web/facebook-redesign/)
+
 ## For a presentation
+
+1. Go through current CSS approaches and problems their pros/cons
+2. Arrive at wanting a prop-based `box`
+3. Namespaced `row`, `col`, `flex`
+4. First-class vs second-class props
+5. Think of this in WYSIWYG: primitives are your pallete on the left. First-class props show on the right. Edit second-class props in tabbed sections of right pane.
+6. What are the correct primitives to have? Again, think about the WYSIWYG. Which building blocks do you need in the left pane?
+
+---
+
+Meet people where they are. This is what Pete Hunt did with React.
+
+https://reactpodcast.com/episodes/96
+
+> When people say they don’t want to change what they really mean is they don’t have an incentive to change.
+>
+> Change the incentives and the behavior follows suit.
+>
+> James Clear
+
+---
+
+"I'd like to talk about the developer experience of writing styles"
+
+- css, css-modules, ...
+
+Also good for DX of _reading_ styles.
+
+Still works for UX...
+
+---
 
 ```jsx
 <div className="container">
