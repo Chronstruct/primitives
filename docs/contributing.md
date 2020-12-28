@@ -8,6 +8,10 @@ To run a single test, use `yarn test -t 'test name'`. e.g. `run test -t "chronst
 
 `npm publish`. If errors with "You must be logged in to publish packages", then `npm login`.
 
+### Types
+
+Currently not using Typescript directly. Use its jsDoc form though: [TypeScript, Minus TypeScript | CSS-Tricks](https://css-tricks.com/typescript-minus-typescript/)
+
 ### Other
 
 - [Babel types · Babel](https://babeljs.io/docs/core-packages/babel-types)

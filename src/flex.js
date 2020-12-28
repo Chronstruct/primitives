@@ -143,7 +143,7 @@ var defaultFlex = {
   display: t.stringLiteral("flex"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  flexShrink: t.numericLiteral(0),
+  // flexShrink: t.numericLiteral(0),
 }
 
 var defaultCol = {
@@ -151,7 +151,7 @@ var defaultCol = {
   flexDirection: t.stringLiteral("column"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  flexShrink: t.numericLiteral(0),
+  // flexShrink: t.numericLiteral(0),
 }
 
 var defaultRow = {
@@ -159,7 +159,7 @@ var defaultRow = {
   flexDirection: t.stringLiteral("row"),
   alignContent: t.stringLiteral("flex-start"),
   position: t.stringLiteral("relative"),
-  flexShrink: t.numericLiteral(0),
+  // flexShrink: t.numericLiteral(0),
 }
 
 module.exports = function (node, tagName) {

@@ -2,10 +2,13 @@
 
 Semantic primitives for **developers** that improve DX without hurting UX.
 
-- Meaningful tag names
-- Property-based styles that reduce developer friction
+Features:
+
 - Single-purpose primitives with focussed APIs
-- Uncompromised user experience
+  - Meaningful tag names
+  - Layout separate from styles
+- Property-based styles that reduce developer friction
+- An uncompromised user experience
 
 Currently supported primitives: `box`, `row`, `column`, `flex`, `space`, `txt`
 

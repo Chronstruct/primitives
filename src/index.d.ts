@@ -53,7 +53,7 @@ export interface BoxProps extends PrimitiveProps {
   marginBottom?: NumberOrString
   marginLeft?: NumberOrString
 
-  position?: "relative" | "fixed" | "static"
+  position?: "relative" | "fixed" | "static" | "absolute"
   // overflow: "overflow",
   // overflowX: "overflowX",
   // overflowY: "overflowY",
@@ -68,6 +68,7 @@ export interface BoxProps extends PrimitiveProps {
 
   onMouseEnter?: Function
   onMouseLeave?: Function
+  onClick?: Function
 
   // pointerEvents?: PointerEventsProperty
   pointerEvents?: "none" | "auto" | "inherit" | "initial" | "unset"
@@ -80,16 +81,39 @@ export interface BoxProps extends PrimitiveProps {
 }
 
 export interface StackBaseProps extends BoxProps {
-  // wrap: "flexWrap",
-  // grow?: NumberOrBoolean
-  // shrink?: NumberOrBoolean
-  // basis?: NumberOrString
-  // order: "order",
-  // alignContent: "alignContent",
-  // alignSelf: "alignSelf",
-  // align: "alignItems",
-  // justify: "justifyContent",
-
+  wrap?: "flexWrap"
+  grow?: NumberOrBoolean
+  shrink?: NumberOrBoolean
+  basis?: NumberOrString
+  order?: number
+  alignContent?:
+    | "stretch"
+    | "center"
+    | "start"
+    | "end"
+    | "space-between"
+    | "space-around"
+    | "space-evenly"
+    | "baseline"
+    | "first baseline"
+    | "last baseline"
+  alignSelf?:
+    | "stretch"
+    | "center"
+    | "start"
+    | "end"
+    | "baseline"
+    | "first baseline"
+    | "last baseline"
+  align?: "stretch" | "center" | "start" | "end"
+  justify?:
+    | "stretch"
+    | "space-between"
+    | "space-around"
+    | "space-evenly"
+    | "center"
+    | "start"
+    | "end"
   center?: BooleanOnly
   inline?: BooleanOnly
 }

@@ -93,3 +93,9 @@ Maybe above is why I should make a lib of util functions with examples for how p
 - `center` -> `text-align: center;`
 - `bold` -> `font-weight: bold;`
 - `uppercase` -> `text-transform: uppercase;`
+
+## `pic` props
+
+Not yet implemented
+
+## `vid` props

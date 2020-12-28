@@ -1,10 +1,33 @@
-# Random notes
+# Random notes (to me for now)
 
 "Meaningful primitives for developers that improve DX without sacrificing UX"
 
 "Developer-first primitives that don't sacrifice UX"
 
 - Meaning of "developer-first": writing, reading, updating experience -> speed, flow, joy
+
+"UX and DX of styles"
+- Doing the right thing for your users, but also enjoying it... (Constelation)
+
+For a delightful user AND developer experience.
+
+"Better primitives for UX **and** DX"
+
+---
+
+Remember to thank React Native for inspiring this library. Without them re-thinking View APIs, I wouldn't have stepped into this world of creating my own primitives.
+
+---
+
+<img src="assets/2020-12-28-09-43-48.png" width=""/>
+
+---
+
+<img src="assets/2020-12-28-09-41-26.png" width=""/>
+
+Two kinds of dynamic:
+- variants (dynamic choosing of presets)
+- unknowns (styles figured out at runtime (often applied as inline `style`))
 
 ---
 
@@ -22,6 +45,10 @@ Layout primitives care about their own geometry and positioning their children
 
 ---
 
+<img src="assets/2020-12-27-11-41-31.png" width=""/>
+
+---
+
 ## On Atomic-ish CSS
 
 Using Linaria's hash-based naming (not scoped to each component).
@@ -32,7 +59,7 @@ Using Linaria's hash-based naming (not scoped to each component).
 
 ## For a presentation
 
-1. Go through current CSS approaches and problems their pros/cons
+1. Go through current CSS approaches and their pros/cons
 2. Arrive at wanting a prop-based `box`
 3. Namespaced `row`, `col`, `flex`
 4. First-class vs second-class props
