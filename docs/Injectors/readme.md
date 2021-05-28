@@ -15,6 +15,12 @@ Well, maybe I'm wrong. Below doesn't seem so bad. Could also benefit from enhanc
 
 Though I do think `interact_` still has its uses here. Making something interactive is important, and should not be hidden away in the props of the primitive.
 
+---
+
+Think of these injectors as the right side of a GUI builder. The default set of props for the primitive is the default tab on the right, but there is a `style`, `animate`, and `event` tab, too.
+
+Note that this way of thinking/building may work well if/when we all use visuals tools more than code in the near future (link to blog post).
+
 ## `style_`
 
 `<style_ />` will pass in a `classname` to its direct child. Therefore, it works on any component that accepts `classname`.
