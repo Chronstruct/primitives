@@ -3,10 +3,6 @@
     /* from -> to */
   }
   <div className={css`
-  display: flex;
-  align-content: flex-start;
-  position: relative;
-  flex-shrink: 0;
   animation-delay: 3s;
   animation-duration: 300ms;
   animation-timing-function: ease;
@@ -33,10 +29,6 @@
     /* percentage keyframes repeated */
   }
   <div className={css`
-  display: flex;
-  align-content: flex-start;
-  position: relative;
-  flex-shrink: 0;
   animation-duration: 4s;
   animation-timing-function: ease-out;
   animation-iteration-count: infinite;

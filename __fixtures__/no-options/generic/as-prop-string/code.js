@@ -1,1 +1,1 @@
-<view tag="nav"/>
+<generic $="nav"/>

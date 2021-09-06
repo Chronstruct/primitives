@@ -1,6 +1,6 @@
 <>
 {/* from -> to */}
-<view
+<generic
   _animate={{
     delay: "3s",
     duration: "300ms",
@@ -23,7 +23,7 @@
 />
 
 {/* percentage keyframes repeated */}
-<view 
+<generic 
   _animate={{
     duration: "4s",
     easing: "ease-out",

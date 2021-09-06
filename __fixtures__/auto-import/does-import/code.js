@@ -1,3 +1,3 @@
 const something = () => (
-    <view />
+  <generic />
 )

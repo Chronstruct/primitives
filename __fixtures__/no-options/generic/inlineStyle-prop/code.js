@@ -1,1 +1,1 @@
-<view inlineStyle={{backgroundColor: 'red', top: 0}} />
+<generic inlineStyle={{backgroundColor: 'red', top: 0}} />

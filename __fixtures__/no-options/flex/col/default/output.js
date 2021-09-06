@@ -3,5 +3,4 @@
   flex-direction: column;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
 `} />;

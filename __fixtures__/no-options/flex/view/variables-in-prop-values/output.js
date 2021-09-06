@@ -6,7 +6,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
 `} style={{
     flexGrow: someVar
   }} />
@@ -18,7 +17,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
 `} style={{
     flexGrow: this.props.grow
   }} />
@@ -30,7 +28,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
 `} style={{
     height: `${someVar}px`
   }} />
@@ -42,7 +39,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
 `} style={{
     flexGrow: `${someVar ? true : false}`
   }} />
@@ -54,7 +50,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   flex-grow: ${ALL_CAPS};
 `} />
 
@@ -65,7 +60,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   height: ${`${ALL_CAPS}px`};
 `} />
 
@@ -76,7 +70,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   flex-grow: ${ALL_CAPS ? true : false};
 `} />
 </>;

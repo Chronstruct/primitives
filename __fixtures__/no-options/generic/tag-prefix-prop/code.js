@@ -1,1 +1,1 @@
-<view tag="button" tag-disabled={true} />
+<generic $="button" $-disabled={true} />

@@ -1,9 +1,9 @@
 <>
-<view className="b__e--m" />
+<generic className="b__e--m" />
 
-<view className={"someString"} />
+<generic className={"someString"} />
 
-<view className={someVar} />
+<generic className={someVar} />
 
-<view className={cx("someString", someBool && "someOtherString")} />
+<generic className={cx("someString", someBool && "someOtherString")} />
 </>

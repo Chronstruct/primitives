@@ -21,7 +21,7 @@ type AnimateValue = {
 }
 
 export interface PrimitiveProps {
-  tag?: string
+  $?: string | React.Element
   hidden?: BooleanOnly
   children?: React.ReactNode
   key?: React.Key

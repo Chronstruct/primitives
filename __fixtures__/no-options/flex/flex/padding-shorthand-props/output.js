@@ -3,7 +3,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   padding-top: 3px;
   padding-bottom: 3px;
 `} />
@@ -12,7 +11,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   padding-right: 10px;
   padding-left: 10px;
 `} />
@@ -21,7 +19,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   padding-top: 3px;
 
   hover {
@@ -35,7 +32,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 0;
   padding-top: 10px;
 
   hover {

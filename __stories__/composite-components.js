@@ -57,8 +57,8 @@ const Link = ({ text, to }) => {
 
   return (
     <box
-      tag="a"
-      tag-href={to}
+      $="a"
+      $-href={to}
       padding="4px 8px"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -332,23 +332,12 @@ const Link = ({ text, to }) => {
 
 storiesOf("Composite Components", module)
   .add("simple link", () => (
-    <box
-      as="a"
-      href="/to-somewhere"
-      padding="4px 8px"
-    >
-      <txt
-        font={DISPLAY_FONT}
-        size={LINK_SIZE}
-        transform="uppercase"
-      >
+    <box $="a" href="/to-somewhere" padding="4px 8px">
+      <txt font={DISPLAY_FONT} size={LINK_SIZE} transform="uppercase">
         simple link
       </txt>
     </box>
   ))
   .add("link with hover effect", () => (
-    <Link
-      text="link with hover effect"
-      to="/somewhere"
-    />
+    <Link text="link with hover effect" to="/somewhere" />
   ))

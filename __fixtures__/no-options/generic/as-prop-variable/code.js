@@ -1,1 +1,1 @@
-<view tag={someVar}/>
+<generic $={someVar}/>

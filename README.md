@@ -33,16 +33,8 @@ With locally reasonable, descriptive ones:
 
 ```jsx
 const MySection = () => (
-  <row
-    tag="section"
-    justify="space-between"
-  >
-    <txt
-      tag="h1"
-      size={10}
-      font="Comic Sans"
-      color="blue"
-    >
+  <row $="section" justify="space-between">
+    <txt $="h1" size={10} font="Comic Sans" color="blue">
       You think you know, and you're right!
     </txt>
     <txt>This text is in a row, so it'll appear right of the heading</txt>
@@ -60,11 +52,7 @@ There are a couple cool things about the primitives above that you may have miss
 This is made possible by a `babel-transform` (or a `webpack-loader`), and some added types if you're using Typescript. At compile time, `chronstruct-primitives` runs through and converts
 
 ```jsx
-<box
-  tag="main"
-  height={20}
-  width={300}
-/>
+<box $="main" height={20} width={300} />
 ```
 
 into
@@ -108,14 +96,7 @@ then, [linaria](https://github.com/callstack/linaria) can work its magic to extr
 ### Property-based styles reduce developer friction
 
 ```jsx
-<txt
-  tag="h1"
-  font="cursive"
-  size={36}
-  height={40}
-  spacing={0.2}
-  color="red"
->
+<txt $="h1" font="cursive" size={36} height={40} spacing={0.2} color="red">
   A Heading
 </txt>
 ```

@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "test-fixtures": "jest __tests__/index.js",
+    "test-fixtures": "jest __tests__/fixtures.js",
     "test-playground": "jest __tests__/playground.js",
     "storybook": "start-storybook -p 9001 -c .storybook"
   },
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "@babel/parser": "^7.15.5",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.0.0",

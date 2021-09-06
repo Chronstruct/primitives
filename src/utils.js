@@ -1,15 +1,20 @@
 "use strict"
 
-// var printAST = require('ast-pretty-print')
+var printAST = require("ast-pretty-print")
 var t = require("@babel/types")
 var objectStylesToTemplate = require("./objectStylesToTemplate")
 
 // from https://stackoverflow.com/questions/43224835
 const allCapsRegex = /^[A-Z]+(?:_[A-Z]+)*$/
-const tagPrefixRegex = /^tag-/
+const tagPrefixRegex = /^\$-/
+
+const BASE_PROPS_TO_OMIT = {
+  $: true,
+}
 
 /**
  * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
+ * @typedef { import("@babel/types").JSXElement } JSXElement
  * @typedef { import("@babel/types").ObjectExpression } ObjectExpression
  */
 
@@ -59,8 +64,7 @@ function buildClassNamePropFunction(t, cssObject, keyAliases, otherClassName) {
 
     if (!isNaN(key)) {
       key = `@media screen and (min-width: ${key}px)`
-    }
-    else if (key in keyAliases) {
+    } else if (key in keyAliases) {
       key = keyAliases[key]
     }
 
@@ -83,8 +87,7 @@ function buildClassNamePropFunction(t, cssObject, keyAliases, otherClassName) {
 
     if (t.isStringLiteral(otherClassName)) {
       text += `${otherClassName.value} `
-    }
-    else if (t.isExpression(otherClassName)) {
+    } else if (t.isExpression(otherClassName)) {
       finalize(otherClassName, " ")
     }
 
@@ -146,8 +149,7 @@ function addTemplateToTemplate(target, template) {
         template.expressions.slice(0)
       )
       target.quasis = target.quasis.concat(template.quasis.slice(0))
-    }
-    else {
+    } else {
       target.expressions = target.expressions.concat(
         template.expressions.slice(0)
       )
@@ -156,8 +158,7 @@ function addTemplateToTemplate(target, template) {
       addStringToTemplate(target, template.quasis[0].value.raw)
       target.quasis = target.quasis.concat(template.quasis.slice(1))
     }
-  }
-  else {
+  } else {
     addStringToTemplate(target, template.quasis[0].value.raw)
   }
 }
@@ -177,26 +178,36 @@ function addExpressionToTemplate(template, expression) {
   template.expressions.push(expression)
 }
 
+/**
+ * @param {JSXElement} node
+ * @param {string} defaultTag
+ */
 function renameTag(node, defaultTag = "div") {
   let tagName = defaultTag
 
-  if (node.openingElement.attributes != null) {
-    var name = node.openingElement.attributes.find((prop) => {
-      return prop.name && prop.name.name === "tag"
+  // Get the prop responsible for the tag
+  const tagProp = node.openingElement.attributes
+    .filter(t.isJSXAttribute)
+    .find((prop) => {
+      return prop.name.name === "$"
     })
 
-    if (name !== undefined) {
-      var val = name.value.value || name.value.expression.value
+  // Use the value of the prop...
+  if (tagProp !== undefined) {
+    const { value: tagValue } = tagProp
 
-      if (val != null) {
-        tagName = val
-      }
-      else {
-        console.log("invalid `tag` value. No variables allowed.")
+    if (t.isStringLiteral(tagValue)) {
+      tagName = tagValue.value
+    } else if (t.isJSXExpressionContainer(tagValue)) {
+      if (t.isStringLiteral(tagValue.expression)) {
+        tagName = tagValue.expression.value
+      } else if (t.isIdentifier(tagValue.expression)) {
+        tagName = tagValue.expression.name
       }
     }
   }
 
+  // ...to overwrite the original element tags
   node.openingElement.name.name = tagName
 
   if (node.closingElement) {
@@ -324,12 +335,10 @@ function addCssProperty(staticStyle, dynamicStyle, key, propValue, valueMap) {
         identifiers.every((expression) => allCapsRegex.test(expression.name))
       ) {
         staticStyle[key] = propValue
-      }
-      else {
+      } else {
         dynamicStyle[key] = propValue
       }
-    }
-    else {
+    } else {
       dynamicStyle[key] = propValue
     }
   }
@@ -348,8 +357,7 @@ function addCssProperty(staticStyle, dynamicStyle, key, propValue, valueMap) {
 
     if (identifiers.every((expression) => allCapsRegex.test(expression.name))) {
       staticStyle[key] = propValue
-    }
-    else {
+    } else {
       dynamicStyle[key] = propValue
     }
   }
@@ -362,16 +370,14 @@ function addCssProperty(staticStyle, dynamicStyle, key, propValue, valueMap) {
       )
     ) {
       staticStyle[key] = propValue
-    }
-    else {
+    } else {
       dynamicStyle[key] = propValue
     }
   }
   // e.g. grow={this.props.grow}
   else if (t.isMemberExpression(propValue)) {
     dynamicStyle[key] = propValue
-  }
-  else {
+  } else {
     staticStyle[key] = propValue
   }
 }
@@ -406,8 +412,7 @@ function addBooleanPropertySet(
 
   if (isShorthandBooleanProp(jsxAttribute)) {
     addCssProperties(staticStyle, dynamicStyle, propertiesToAdd)
-  }
-  else if (t.isJSXExpressionContainer(value)) {
+  } else if (t.isJSXExpressionContainer(value)) {
     var { expression } = value
 
     if (t.isBooleanLiteral(expression) && expression.value === true) {
@@ -442,11 +447,9 @@ function addBooleanProperty(
   // e.g. grow="1" (NOT SUPPORTED by default)
   if (isStringProp(jsxAttribute) && !(config && config.allowString)) {
     return
-  }
-  else if (isShorthandBooleanProp(jsxAttribute)) {
+  } else if (isShorthandBooleanProp(jsxAttribute)) {
     addCssProperty(staticStyle, dynamicStyle, key, valueMap[true])
-  }
-  else if (isExpressionProp(jsxAttribute)) {
+  } else if (isExpressionProp(jsxAttribute)) {
     var { expression } = value
 
     // console.log(expression)
@@ -466,8 +469,7 @@ function addBooleanProperty(
     // e.g. grow={{'': true, 'hover': false}}
     else if (t.isObjectExpression(expression)) {
       addCssProperty(staticStyle, dynamicStyle, key, expression, valueMap)
-    }
-    else {
+    } else {
       addCssProperty(
         staticStyle,
         dynamicStyle,
@@ -475,8 +477,7 @@ function addBooleanProperty(
         expression in valueMap ? valueMap[expression] : expression
       )
     }
-  }
-  else {
+  } else {
     addCssProperty(
       staticStyle,
       dynamicStyle,
@@ -547,15 +548,13 @@ function handleAnimate(staticStyle, dynamicStyle, jsxAttribute) {
         mappedPropertyName,
         property.value
       )
-    }
-    else if (name === "repeat") {
+    } else if (name === "repeat") {
       const { value } = property
 
       // when repeat === true, set it to "infinite"
       if (t.isBooleanLiteral(value) && value.value === true) {
         staticStyle["animationIterationCount"] = t.stringLiteral("infinite")
-      }
-      else {
+      } else {
         addCssProperty(
           staticStyle,
           dynamicStyle,
@@ -563,8 +562,7 @@ function handleAnimate(staticStyle, dynamicStyle, jsxAttribute) {
           property.value
         )
       }
-    }
-    else if (name === "keyframes") {
+    } else if (name === "keyframes") {
       const id = `kf${keyframeIdCounter++}`
 
       // add animation name
@@ -581,6 +579,7 @@ function handleAnimate(staticStyle, dynamicStyle, jsxAttribute) {
   })
 }
 
+exports.BASE_PROPS_TO_OMIT = BASE_PROPS_TO_OMIT
 exports.buildDefaultCssProp = buildDefaultCssProp
 exports.buildClassNamePropFunction = buildClassNamePropFunction
 exports.buildClassNameProp = buildClassNameProp

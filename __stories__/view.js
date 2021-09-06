@@ -6,7 +6,7 @@ import { css } from "linaria"
 storiesOf("view", module)
   .add("as nav", () => (
     <view
-      as="nav"
+      $="nav"
       width="300px"
       height="30px"
       margin="20px"

@@ -4,6 +4,7 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
+  BASE_PROPS_TO_OMIT = Utils.BASE_PROPS_TO_OMIT,
   tagPrefixRegex = Utils.tagPrefixRegex,
   addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
@@ -16,7 +17,7 @@ var renameTag = Utils.renameTag,
 // addExpressionToTemplate = Utils.addExpressionToTemplate
 
 var propsToOmit = {
-  tag: true,
+  ...BASE_PROPS_TO_OMIT,
 }
 
 var cssPropertyMap = {
@@ -91,8 +92,7 @@ module.exports = function (node) {
 
         if (name in propsToOmit) {
           return
-        }
-        else if (name === "style" || name === "_style") {
+        } else if (name === "style" || name === "_style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               staticStyle,
@@ -101,38 +101,32 @@ module.exports = function (node) {
               property.value
             )
           })
-        }
-        else if (name === "inlineStyle" || name === "_inlineStyle") {
+        } else if (name === "inlineStyle" || name === "_inlineStyle") {
           inlineStyleBabelProperties.push(
             ...attribute.value.expression.properties
           )
-        }
-        else if (name === "animate" || name === "_animate") {
+        } else if (name === "animate" || name === "_animate") {
           handleAnimate(staticStyle, dynamicStyle, attribute)
-        }
-        else if (name in cssPropertyMap) {
+        } else if (name in cssPropertyMap) {
           addCssProperty(
             staticStyle,
             dynamicStyle,
             cssPropertyMap[name],
             attribute.value
           )
-        }
-        else if (name in booleanProps) {
+        } else if (name in booleanProps) {
           addBooleanPropertySet(
             staticStyle,
             dynamicStyle,
             attribute,
             booleanProps[name]
           )
-        }
-        else if (name === "grow") {
+        } else if (name === "grow") {
           addBooleanProperty(staticStyle, dynamicStyle, attribute, "flexGrow", {
             true: t.numericLiteral(1),
             false: t.numericLiteral(0),
           })
-        }
-        else if (name === "selectable") {
+        } else if (name === "selectable") {
           addBooleanProperty(
             staticStyle,
             dynamicStyle,
@@ -148,12 +142,14 @@ module.exports = function (node) {
             },
             { allowString: true }
           )
-        }
-        else if (tagPrefixRegex.test(name)) {
+        } else if (tagPrefixRegex.test(name)) {
           attribute.name.name = name.replace(tagPrefixRegex, "")
           props.push(attribute)
-        }
-        else if (name === "html" && node.children && node.children.length > 0) {
+        } else if (
+          name === "html" &&
+          node.children &&
+          node.children.length > 0
+        ) {
           const quasis = []
           const expressions = []
           let text = ""
@@ -168,8 +164,7 @@ module.exports = function (node) {
           node.children.forEach((child) => {
             if (t.isJSXExpressionContainer(child)) {
               finalize(child.expression, "")
-            }
-            else if (t.isJSXText(child)) {
+            } else if (t.isJSXText(child)) {
               text += child.value
             }
           })
@@ -193,18 +188,15 @@ module.exports = function (node) {
 
           // Remove children
           node.children = []
-        }
-        else if (name === "className") {
+        } else if (name === "className") {
           if (t.isJSXExpressionContainer(attribute.value)) {
             otherClassNames = attribute.value.expression
-          }
-          else if (t.isStringLiteral(attribute.value)) {
+          } else if (t.isStringLiteral(attribute.value)) {
             otherClassNames = attribute.value
           }
 
           // Note: skip adding to props
-        }
-        else {
+        } else {
           props.push(attribute)
         }
       })

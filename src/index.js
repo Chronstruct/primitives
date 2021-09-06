@@ -4,6 +4,7 @@
 var convertFlex = require("./flex")
 var convertSpace = require("./space")
 var convertText = require("./text")
+var convertGeneric = require("./generic")
 
 module.exports = function (babel) {
   var { types: t } = babel
@@ -98,6 +99,10 @@ module.exports = function (babel) {
           case "txt":
           case "TEXT":
             convertText(path.node)
+            break
+          // ONLY used in tests!!!
+          case "generic":
+            convertGeneric(path.node)
             break
         }
       },

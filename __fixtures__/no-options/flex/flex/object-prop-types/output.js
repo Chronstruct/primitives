@@ -5,7 +5,6 @@
   display: flex;
   align-content: flex-start;
   position: relative;
-  flex-shrink: 1;
   min-height: 20px;
 
   hover {
@@ -18,4 +17,5 @@
   ${someVar} {
     max-width: 2000px;
   }
+  flex-shrink: 1;
 `} />;

@@ -1,12 +1,55 @@
-var t = require("@babel/types")
-var Utils = require("../src/utils")
-var renameTag = Utils.renameTag,
-  addBooleanPropertySet = Utils.addBooleanPropertySet,
-  addBooleanProperty = Utils.addBooleanProperty,
-  addCssProperty = Utils.addCssProperty,
-  buildClassNamePropFunction = Utils.buildClassNamePropFunction
+const t = require("@babel/types")
+const parser = require("@babel/parser")
+const {
+  renameTag,
+  addBooleanPropertySet,
+  addBooleanProperty,
+  addCssProperty,
+  buildClassNamePropFunction,
+} = require("../src/utils")
 
-//TODO: test renameTag()
+/**
+ * @param {string} node
+ */
+const parse = (node) => parser.parseExpression(node, { plugins: ["jsx"] })
+
+describe("renameTag()", () => {
+  it("handles string literals", () => {
+    // GIVEN
+    const expectedTagName = "xxx"
+    var input = parse(`<div $="${expectedTagName}"/>`)
+
+    // WHEN
+    renameTag(input)
+
+    // THEN
+    expect(input.openingElement.name.name).toEqual(expectedTagName)
+  })
+
+  it("handles string expressions", () => {
+    // GIVEN
+    const expectedTagName = "xxx"
+    var input = parse(`<div $={"${expectedTagName}"}/>`)
+
+    // WHEN
+    renameTag(input)
+
+    // THEN
+    expect(input.openingElement.name.name).toEqual(expectedTagName)
+  })
+
+  it("handles variable expressions", () => {
+    // GIVEN
+    const expectedTagName = "xxx"
+    var input = parse(`<div $={${expectedTagName}}/>`)
+
+    // WHEN
+    renameTag(input)
+
+    // THEN
+    expect(input.openingElement.name.name).toEqual(expectedTagName)
+  })
+})
 
 it("addCssProperty with NumericLiteral", () => {
   var input = {}

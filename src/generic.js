@@ -9,27 +9,32 @@ var renameTag = Utils.renameTag,
   addBooleanProperty = Utils.addBooleanProperty,
   addCssProperty = Utils.addCssProperty,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction,
-  buildStyleProp = Utils.buildStyleProp
+  buildStyleProp = Utils.buildStyleProp,
+  handleAnimate = Utils.handleAnimate
+
+/**
+ * @typedef { import("@babel/types").JSXAttribute } JSXAttribute
+ * @typedef { import("@babel/types").JSXElement } JSXElement
+ * @typedef { import("@babel/types").ObjectExpression } ObjectExpression
+ */
 
 var propsToOmit = {
   ...BASE_PROPS_TO_OMIT,
 }
 
-var cssProps = {
-  size: "flexBasis",
-}
+var cssProps = {}
 
-var booleanProps = {
-  grow: "flexGrow",
-  shrink: "flexShrink",
-}
+var booleanProps = {}
 
-var defaultCss = {
-  flexGrow: t.numericLiteral(0),
-  flexShrink: t.numericLiteral(0),
-}
+var defaultCss = {}
 
+/**
+ * @param {JSXElement} node
+ */
 module.exports = function (node) {
+  /**
+   * @param {JSXElement} node
+   */
   function buildProps(node) {
     var staticStyle = Object.assign({}, defaultCss)
     var dynamicStyle = {}
@@ -38,8 +43,12 @@ module.exports = function (node) {
 
     let otherClassNames
 
-    if (node.openingElement.attributes != null) {
+    if (node.openingElement.attributes.length > 0) {
       node.openingElement.attributes.forEach((attribute) => {
+        // Spread props not supported
+        if (t.isJSXSpreadAttribute(attribute)) {
+          return
+        }
         var name = attribute.name.name
 
         if (name in propsToOmit) {
@@ -58,6 +67,8 @@ module.exports = function (node) {
           inlineStyleBabelProperties.push(
             ...attribute.value.expression.properties
           )
+        } else if (name === "animate" || name === "_animate") {
+          handleAnimate(staticStyle, dynamicStyle, attribute)
         } else if (name in cssProps) {
           addCssProperty(
             staticStyle,
@@ -119,42 +130,6 @@ module.exports = function (node) {
 
     return props
   }
-
-  /*
-  function addCssProp(cssTemplate, attribute, name) {
-    var { value } = attribute
-
-    if (t.isJSXExpressionContainer(value)) {
-      var { expression } = value
-
-      // console.log(printAST(expression));
-
-      if (t.isStringLiteral(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: ${expression.value};`)
-      }
-      else if (t.isIdentifier(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: `)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-        addExpressionToTemplate(cssTemplate, t.identifier(expression.name))
-      }
-      else if (t.isTemplateLiteral(expression)) {
-        expression.quasis[0].value.cooked = `${name}: ${expression.quasis[0].value.cooked}`
-        expression.quasis[0].value.raw = `${name}: ${expression.quasis[0].value.raw}`
-        addTemplateToTemplate(cssTemplate, expression)
-        addStringToTemplate(cssTemplate, `;`)
-      }
-      else if (t.isConditionalExpression(expression)) {
-        addStringToTemplate(cssTemplate, `${name}: `)
-        addExpressionToTemplate(cssTemplate, expression)
-        addQuasiToTemplate(cssTemplate, t.templateElement({raw: ';', cooked: ';'}))
-      }
-
-    }
-    else if (t.isStringLiteral(value)) {
-      addStringToTemplate(cssTemplate, `${name}: ${value.value};`)
-    }
-  }
-  */
 
   renameTag(node)
   node.openingElement.attributes = buildProps(node)

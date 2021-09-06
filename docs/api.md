@@ -20,7 +20,7 @@ Maybe above is why I should make a lib of util functions with examples for how p
 
 ### String/number
 
-- `as` -> what DOM node will be used to represent this element (used primarily for semantic html)
+- `$` -> what DOM node will be used to represent this element (used primarily for semantic html)
 - `top`: 'top',
 - `right`: 'right',
 - `bottom`: 'bottom',
@@ -67,14 +67,14 @@ Maybe above is why I should make a lib of util functions with examples for how p
 
 ## `Space` props
 
-- `as` -> what DOM node will be used to represent this element (used primarily for semantic html)
+- `$` -> what DOM node will be used to represent this element (used primarily for semantic html)
 - `size`
 
 ## `Text` props
 
 ### String/number
 
-- `as` -> what DOM node will be used to represent this element (used primarily for semantic html)
+- `$` -> what DOM node will be used to represent this element (used primarily for semantic html)
 - `align`: 'textAlign',
 - `color`: 'color',
 - `decoration`: 'textDecoration',

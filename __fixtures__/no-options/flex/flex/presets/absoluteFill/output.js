@@ -2,7 +2,6 @@
   display: flex;
   align-content: flex-start;
   position: absolute;
-  flex-shrink: 0;
   top: 0px;
   right: 0px;
   bottom: 0px;

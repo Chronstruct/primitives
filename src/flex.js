@@ -4,6 +4,7 @@
 var t = require("@babel/types")
 var Utils = require("./utils")
 var renameTag = Utils.renameTag,
+  BASE_PROPS_TO_OMIT = Utils.BASE_PROPS_TO_OMIT,
   tagPrefixRegex = Utils.tagPrefixRegex,
   addBooleanPropertySet = Utils.addBooleanPropertySet,
   addCssProperty = Utils.addCssProperty,
@@ -12,8 +13,13 @@ var renameTag = Utils.renameTag,
   buildClassNamePropFunction = Utils.buildClassNamePropFunction,
   buildStyleProp = Utils.buildStyleProp
 
+/**
+ * @typedef { import("@babel/types").JSXElement } JSXElement
+ * @typedef { import("@babel/types").ObjectExpression } ObjectExpression
+ */
+
 var propsToOmit = {
-  tag: true,
+  ...BASE_PROPS_TO_OMIT,
 }
 
 var booleanProps = {
@@ -162,7 +168,16 @@ var defaultRow = {
   // flexShrink: t.numericLiteral(0),
 }
 
+/**
+ * @param {JSXElement} node
+ * @param {string} tagName
+ */
 module.exports = function (node, tagName) {
+  /**
+   * @param {JSXElement} node
+   * @param {*} defaulotCss
+   * @param {*} cssPropMap
+   */
   function buildProps(node, defaultCss, cssPropMap) {
     // var css = buildDefaultCssProp(t, defaultCss)
     var staticStyle = Object.assign({}, defaultCss)
@@ -188,8 +203,7 @@ module.exports = function (node, tagName) {
 
         if (name in propsToOmit) {
           return
-        }
-        else if (name === "style" || name === "_style") {
+        } else if (name === "style" || name === "_style") {
           attribute.value.expression.properties.forEach((property) => {
             addCssProperty(
               staticStyle,
@@ -198,24 +212,20 @@ module.exports = function (node, tagName) {
               property.value
             )
           })
-        }
-        else if (name === "inlineStyle" || name === "_inlineStyle") {
+        } else if (name === "inlineStyle" || name === "_inlineStyle") {
           inlineStyleBabelProperties.push(
             ...attribute.value.expression.properties
           )
-        }
-        else if (name === "animate" || name === "_animate") {
+        } else if (name === "animate" || name === "_animate") {
           handleAnimate(staticStyle, dynamicStyle, attribute)
-        }
-        else if (name in cssPropMap) {
+        } else if (name in cssPropMap) {
           const mappedProperty = cssPropMap[name]
 
           if (Array.isArray(mappedProperty)) {
             mappedProperty.forEach((prop) => {
               addCssProperty(staticStyle, dynamicStyle, prop, attribute.value)
             })
-          }
-          else {
+          } else {
             addCssProperty(
               staticStyle,
               dynamicStyle,
@@ -223,16 +233,14 @@ module.exports = function (node, tagName) {
               attribute.value
             )
           }
-        }
-        else if (name in booleanProps) {
+        } else if (name in booleanProps) {
           addBooleanPropertySet(
             staticStyle,
             dynamicStyle,
             attribute,
             booleanProps[name]
           )
-        }
-        else if (name === "grow") {
+        } else if (name === "grow") {
           addBooleanProperty(
             staticStyle,
             dynamicStyle,
@@ -244,8 +252,7 @@ module.exports = function (node, tagName) {
             },
             { allowNumber: true }
           )
-        }
-        else if (name === "shrink") {
+        } else if (name === "shrink") {
           addBooleanProperty(
             staticStyle,
             dynamicStyle,
@@ -257,22 +264,18 @@ module.exports = function (node, tagName) {
             },
             { allowNumber: true }
           )
-        }
-        else if (tagPrefixRegex.test(name)) {
+        } else if (tagPrefixRegex.test(name)) {
           attribute.name.name = name.replace(tagPrefixRegex, "")
           props.push(attribute)
-        }
-        else if (name === "className") {
+        } else if (name === "className") {
           if (t.isJSXExpressionContainer(attribute.value)) {
             otherClassNames = attribute.value.expression
-          }
-          else if (t.isStringLiteral(attribute.value)) {
+          } else if (t.isStringLiteral(attribute.value)) {
             otherClassNames = attribute.value
           }
 
           // Note: skip adding to props
-        }
-        else {
+        } else {
           props.push(attribute)
         }
       })
@@ -307,16 +310,13 @@ module.exports = function (node, tagName) {
   if (tagName === "view" || tagName === "box" || tagName === "BOX") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
-  }
-  else if (tagName === "col" || tagName === "column" || tagName === "v") {
+  } else if (tagName === "col" || tagName === "column" || tagName === "v") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultCol, propMap)
-  }
-  else if (tagName === "row" || tagName === "h") {
+  } else if (tagName === "row" || tagName === "h") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultRow, propMap)
-  }
-  else if (tagName === "flex" || tagName === "stack") {
+  } else if (tagName === "flex" || tagName === "stack") {
     renameTag(node)
     node.openingElement.attributes = buildProps(node, defaultFlex, flexPropMap)
   }

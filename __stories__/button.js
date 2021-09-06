@@ -5,7 +5,7 @@ import { css } from "linaria"
 
 storiesOf("Button", module).add("simple with onClick", () => (
   <view
-    as="button"
+    $="button"
     padding={16}
     onClick={action("button-click")}
     //_events={{

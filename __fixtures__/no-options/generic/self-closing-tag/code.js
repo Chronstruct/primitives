@@ -1,1 +1,1 @@
-<view />
+<generic />
