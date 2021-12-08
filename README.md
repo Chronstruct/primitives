@@ -1,6 +1,8 @@
 # Chronstruct Primitives
 
-Semantic primitives for **developers** that improve DX without hurting UX.
+> Semantic primitives for _developers_ that improve DX without hurting UX.
+
+A modern take on DOM primitives that leverages a Babel transform to convert prop-based styles into `css` (when static) and inline `styles` (when dynamic).
 
 Features:
 
@@ -9,8 +11,6 @@ Features:
   - Layout separate from styles
 - Property-based styles that reduce developer friction
 - An uncompromised user experience
-
-Currently supported primitives: `box`, `row`, `column`, `flex`, `space`, `txt`
 
 [Installation](docs/installation.md) | Guides | [API](docs/api.md) | FAQ
 
@@ -29,7 +29,7 @@ const MySection = () => (
 )
 ```
 
-With locally reasonable, descriptive ones:
+With _locally reasonable_, descriptive ones:
 
 ```jsx
 const MySection = () => (

@@ -71,6 +71,10 @@ function buildClassNamePropFunction(t, cssObject, keyAliases, otherClassName) {
     return t.objectProperty(t.identifier(key), value)
   })
 
+  if (objectProperties.length === 0) {
+    return undefined
+  }
+
   const cssLiteral = objectStylesToTemplate(objectProperties)
 
   // Combine passed in className and cssLiteral
@@ -202,6 +206,8 @@ function renameTag(node, defaultTag = "div") {
       if (t.isStringLiteral(tagValue.expression)) {
         tagName = tagValue.expression.value
       } else if (t.isIdentifier(tagValue.expression)) {
+        // TODO return React.createElement() to handle case where identifier is lowercase
+        // @see https://github.com/Chronstruct/primitives/issues/64
         tagName = tagValue.expression.name
       }
     }

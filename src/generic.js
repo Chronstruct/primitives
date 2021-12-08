@@ -111,8 +111,11 @@ module.exports = function (node) {
       cssProps,
       otherClassNames
     )
-    classNameProp.value.expression.loc = node.loc
-    props.push(classNameProp)
+
+    if (classNameProp !== undefined) {
+      classNameProp.value.expression.loc = node.loc
+      props.push(classNameProp)
+    }
 
     // Add inline styles prop if there are styles to add
     if (
