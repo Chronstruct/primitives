@@ -1,6 +1,6 @@
 # Thinking in Layers
 
-[WIP]
+> !! This document is a work in progress !!
 
 <img src="assets/layers.png" width=""/>
 

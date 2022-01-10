@@ -1,6 +1,6 @@
 # Variants, Config, and Kind
 
-[WIP]
+> !! This document is a work in progress !!
 
 Two primary uses of primitives: 1) interspersed throughout a composite component (div). 2) abstracted by another component and used as primitive instead (AppText).
 

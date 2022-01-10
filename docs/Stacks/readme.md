@@ -1,8 +1,9 @@
 # All about `stack`s
 
-[WIP]
+> !! This document is a work in progress !!
 
 Why `stack` instead of `flex`?
+
 - z axis is accounted for. Flexbox doesn't ahve an answer for this.
 
 ## `zStack`

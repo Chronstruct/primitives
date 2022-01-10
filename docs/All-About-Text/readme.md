@@ -1,6 +1,6 @@
 # All About `<text />`
 
-[WIP]
+> !! This document is a work in progress !!
 
 Don't be fooled by how simple text seems. It is actually very complicated, which is why browsers and other renderers (e.g. Flutter) have a dedicated text renderer. Why? Well, it has to handle shapes (characters), layout (bounding region), and behavior (text wrapping, position, etc). No easy task.
 

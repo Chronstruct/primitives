@@ -1,8 +1,9 @@
 # Definitions and Terms
 
-[WIP]
+> !! This document is a work in progress !!
 
 `<box />` is a **surface**, not a layout component
+
 - cardboard would be paintable surface w/o child.
 - could also picture a box wrapping only one child.
 

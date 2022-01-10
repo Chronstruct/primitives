@@ -1,5 +1,7 @@
 # Random notes (to me for now)
 
+> !! This document is a work in progress !!
+
 "Meaningful primitives for developers that improve DX without sacrificing UX"
 
 "Developer-first primitives that don't sacrifice UX"
@@ -7,6 +9,7 @@
 - Meaning of "developer-first": writing, reading, updating experience -> speed, flow, joy
 
 "UX and DX of styles"
+
 - Doing the right thing for your users, but also enjoying it... (Constelation)
 
 For a delightful user AND developer experience.
@@ -26,6 +29,7 @@ Remember to thank React Native for inspiring this library. Without them re-think
 <img src="assets/2020-12-28-09-41-26.png" width=""/>
 
 Two kinds of dynamic:
+
 - variants (dynamic choosing of presets)
 - unknowns (styles figured out at runtime (often applied as inline `style`))
 
@@ -108,19 +112,12 @@ Ask audience what they expect the web app to look like. Surprise them with a ver
 
 ```jsx
 <column>
-  <row
-    tag="nav"
-    height={80}
-    align="center"
-  >
+  <row tag="nav" height={80} align="center">
     <Link />
     <Link />
   </row>
 
-  <column
-    tag="main"
-    center
-  >
+  <column tag="main" center>
     <txt
       tag="h1"
       font="cursive"
@@ -141,14 +138,7 @@ What if nav should be on top for phone? Introduce configuration objects for resp
 `<flex direction={{ _: "column", MEDIUM_UP: "row" }}>`
 
 ```jsx
-<txt
-  tag="h1"
-  font="cursive"
-  size={36}
-  height={40}
-  spacing={0.2}
-  color="red"
->
+<txt tag="h1" font="cursive" size={36} height={40} spacing={0.2} color="red">
   A Heading
 </txt>
 ```
@@ -288,11 +278,7 @@ _Semantic html_ is necessary for users of screen readers and your SEO. They're i
 It better describes the intent and type of a tag. These primitives are _semantic_ for us **developers** (and still render as sematic html).
 
 ```jsx
-<col
-  as='main"'
-  height={200}
-  width={400}
->
+<col as='main"' height={200} width={400}>
   <view
     as="section"
     grow
@@ -302,15 +288,8 @@ It better describes the intent and type of a tag. These primitives are _semantic
   />
 
   <row as="section">
-    <view
-      padding={20}
-      marginTop={10}
-      zIndex={100}
-    />
-    <view
-      width="20%"
-      minWidth={200}
-    />
+    <view padding={20} marginTop={10} zIndex={100} />
+    <view width="20%" minWidth={200} />
   </row>
 
   <space size={20} />
