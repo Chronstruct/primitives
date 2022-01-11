@@ -100,6 +100,8 @@ https://github.com/Chronstruct/primitives/issues/27
 
 ### Paint, Layouts, and Events
 
+> or Structure, Style, and Events
+
 All things reduce to Paint, Layout, and Events
 
 Or, painters, layout(ers), and event handlers (emitters and/or receivers). Any component on screen may be some combination of the 3.
