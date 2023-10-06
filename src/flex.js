@@ -59,6 +59,8 @@ var booleanProps = {
 const propMap = {
   paddingVertical: ["paddingTop", "paddingBottom"],
   paddingHorizontal: ["paddingRight", "paddingLeft"],
+  marginVertical: ["paddingTop", "paddingBottom"],
+  marginHorizontal: ["paddingRight", "paddingLeft"],
 
   top: "top",
   right: "right",

@@ -52,6 +52,8 @@ export interface BoxProps extends PrimitiveProps {
   marginRight?: NumberOrString
   marginBottom?: NumberOrString
   marginLeft?: NumberOrString
+  marginVertical?: NumberOrString
+  marginHorizontal?: NumberOrString
 
   position?: "relative" | "fixed" | "static" | "absolute"
   // overflow: "overflow",
